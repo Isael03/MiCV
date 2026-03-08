@@ -57,6 +57,12 @@ El usuario al ingresar la información en el formulario, podrá tener una previs
 - App.tsx
 - index.tsx
 
+#### Carpeta src/frontend/features/[modulo]/hooks
+Almacena los hooks personalizados del modulo o vista. Es decir la lógica reutilizable entre componentes o vistas.
+
+#### Carpeta src/frontend/features/[modulo]/components
+Almacena los componentes personalizados del modulo o vista.
+
 #### Carpeta src/frontend/features
 features
    cv-builder

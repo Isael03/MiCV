@@ -61,10 +61,10 @@ function Preview() {
             </div>
           </div>
 
-          {cv.personalInfo.summary && (
+          {cv.summary && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-700 mb-2">Resumen</h3>
-              <p className="text-gray-600">{cv.personalInfo.summary}</p>
+              <p className="text-gray-600">{cv.summary}</p>
             </div>
           )}
 
@@ -101,7 +101,7 @@ function Preview() {
               <div className="flex flex-wrap gap-2">
                 {cv.skills.map((skill, index) => (
                   <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                    {skill}
+                    {skill.name}
                   </span>
                 ))}
               </div>

@@ -4,8 +4,6 @@ import { Header } from '../../../shared/layouts/Header'
 import { Footer } from '../../../shared/layouts/Footer'
 import { ProjectList } from '../components/ProjectList'
 import { NewProjectDialog } from '../components/NewProjectDialog'
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 
 function Home() {
   const { projects, createProject, deleteProject } = useCVStore()
@@ -20,13 +18,7 @@ function Home() {
       <Header />
       
       <main className="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
-        <Field>
-      <FieldLabel htmlFor="input-demo-api-key">API Key</FieldLabel>
-      <Input id="input-demo-api-key" type="password" placeholder="sk-..." />
-      <FieldDescription>
-        Your API key is encrypted and stored securely.
-      </FieldDescription>
-    </Field>
+        
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Mis Currículums</h1>
