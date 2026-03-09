@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCVStore } from '../../../store/cvStore'
 import { Header } from '../../../shared/layouts/Header'
 import { Footer } from '../../../shared/layouts/Footer'
@@ -9,6 +9,9 @@ function Home() {
   const { projects, createProject, deleteProject } = useCVStore()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
+  useEffect(()=>{
+    window.cv.findAll()
+  },[])
   const handleCreateProject = (name: string) => {
     createProject(name)
   }

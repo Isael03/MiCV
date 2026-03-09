@@ -6,3 +6,4 @@ release
 .vscode
 .agent
 .agents
+/generated/prisma

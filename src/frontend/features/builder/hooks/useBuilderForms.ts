@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -62,17 +62,10 @@ export const languagesSchema = z.object({
 })
 
 export function useBuilderForms(cvData: CVData | undefined) {
-  const { 
-    updatePersonalInfo,
-    updateSummary,
-    updateExperience,
-    updateEducation,
-    updateProjectItem,
-    updateSkill,
-    updateLanguage,
-  } = useCVStore()
-
+  const store = useCVStore()
+  
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const isInitializedRef = useRef(false)
 
   const personalForm = useForm({
     resolver: zodResolver(personalInfoSchema),
@@ -135,7 +128,7 @@ export function useBuilderForms(cvData: CVData | undefined) {
   })
 
   useEffect(() => {
-    if (cvData) {
+    if (cvData && !isInitializedRef.current) {
       personalForm.reset(cvData.personalInfo)
       summaryForm.reset({ summary: cvData.summary })
       experienceForm.reset({ experiences: cvData.experience })
@@ -143,36 +136,41 @@ export function useBuilderForms(cvData: CVData | undefined) {
       projectsForm.reset({ projects: cvData.projects })
       skillsForm.reset({ skills: cvData.skills })
       languagesForm.reset({ languages: cvData.languages })
+      isInitializedRef.current = true
     }
   }, [cvData])
 
   useEffect(() => {
     const subscription = personalForm.watch((data) => {
-      const d = data as { name?: string; email?: string; phone?: string; photo?: string }
-      updatePersonalInfo({
-        name: d.name || '',
-        email: d.email || '',
-        phone: d.phone || '',
-        photo: d.photo || '',
-      })
+      if (isInitializedRef.current) {
+        const d = data as { name?: string; email?: string; phone?: string; photo?: string }
+        store.updatePersonalInfo({
+          name: d.name || '',
+          email: d.email || '',
+          phone: d.phone || '',
+          photo: d.photo || '',
+        })
+      }
     })
     return () => { subscription.unsubscribe() }
-  }, [personalForm.watch, updatePersonalInfo])
+  }, [personalForm.watch])
 
   useEffect(() => {
     const subscription = summaryForm.watch((data) => {
-      const d = data as { summary?: string }
-      updateSummary(d.summary || '')
+      if (isInitializedRef.current) {
+        const d = data as { summary?: string }
+        store.updateSummary(d.summary || '')
+      }
     })
     return () => subscription.unsubscribe()
-  }, [summaryForm.watch, updateSummary])
+  }, [summaryForm.watch])
 
   useEffect(() => {
     const subscription = experienceForm.watch((data) => {
-      if (data.experiences) {
+      if (isInitializedRef.current && data.experiences) {
         data.experiences.forEach((exp) => {
           const expData = exp as { id: string; company?: string; position?: string; startDate?: string; endDate?: string; description?: string }
-          updateExperience(expData.id, {
+          store.updateExperience(expData.id, {
             company: expData.company ?? '',
             position: expData.position ?? '',
             startDate: expData.startDate ?? '',
@@ -183,14 +181,14 @@ export function useBuilderForms(cvData: CVData | undefined) {
       }
     })
     return () => subscription.unsubscribe()
-  }, [experienceForm.watch, updateExperience])
+  }, [experienceForm.watch])
 
   useEffect(() => {
     const subscription = educationForm.watch((data) => {
-      if (data.education) {
+      if (isInitializedRef.current && data.education) {
         data.education.forEach((edu) => {
           const eduData = edu as { id: string; school?: string; degree?: string; year?: string }
-          updateEducation(eduData.id, {
+          store.updateEducation(eduData.id, {
             school: eduData.school ?? '',
             degree: eduData.degree ?? '',
             year: eduData.year ?? '',
@@ -199,14 +197,14 @@ export function useBuilderForms(cvData: CVData | undefined) {
       }
     })
     return () => subscription.unsubscribe()
-  }, [educationForm.watch, updateEducation])
+  }, [educationForm.watch])
 
   useEffect(() => {
     const subscription = projectsForm.watch((data) => {
-      if (data.projects) {
+      if (isInitializedRef.current && data.projects) {
         data.projects.forEach((proj) => {
           const projData = proj as { id: string; name?: string; description?: string; link?: string }
-          updateProjectItem(projData.id, {
+          store.updateProjectItem(projData.id, {
             name: projData.name ?? '',
             description: projData.description ?? '',
             link: projData.link,
@@ -215,14 +213,14 @@ export function useBuilderForms(cvData: CVData | undefined) {
       }
     })
     return () => subscription.unsubscribe()
-  }, [projectsForm.watch, updateProjectItem])
+  }, [projectsForm.watch])
 
   useEffect(() => {
     const subscription = skillsForm.watch((data) => {
-      if (data.skills) {
+      if (isInitializedRef.current && data.skills) {
         data.skills.forEach((skill) => {
           const skillData = skill as { id: string; name?: string; level?: 'basic' | 'intermediate' | 'advanced' | 'native' }
-          updateSkill(skillData.id, {
+          store.updateSkill(skillData.id, {
             name: skillData.name ?? '',
             level: skillData.level,
           })
@@ -230,14 +228,14 @@ export function useBuilderForms(cvData: CVData | undefined) {
       }
     })
     return () => subscription.unsubscribe()
-  }, [skillsForm.watch, updateSkill])
+  }, [skillsForm.watch])
 
   useEffect(() => {
     const subscription = languagesForm.watch((data) => {
-      if (data.languages) {
+      if (isInitializedRef.current && data.languages) {
         data.languages.forEach((lang) => {
           const langData = lang as { id: string; name?: string; level: 'basic' | 'intermediate' | 'advanced' | 'native' }
-          updateLanguage(langData.id, {
+          store.updateLanguage(langData.id, {
             name: langData.name ?? '',
             level: langData.level,
           })
@@ -245,19 +243,19 @@ export function useBuilderForms(cvData: CVData | undefined) {
       }
     })
     return () => subscription.unsubscribe()
-  }, [languagesForm.watch, updateLanguage])
+  }, [languagesForm.watch])
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        updatePersonalInfo({ photo: reader.result as string })
+        store.updatePersonalInfo({ photo: reader.result as string })
         personalForm.setValue('photo', reader.result as string)
       }
       reader.readAsDataURL(file)
     }
-  }
+  }, [store, personalForm])
 
   return {
     fileInputRef,
