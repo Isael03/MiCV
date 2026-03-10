@@ -27,9 +27,6 @@ export default defineConfig({
             rollupOptions: {
               external: [
                 "electron",
-                "typeorm",
-                "sql.js",
-                "reflect-metadata",
                 ...builtinModules,
                 ...builtinModules.map((m) => `node:${m}`),
               ],

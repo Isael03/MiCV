@@ -1,9 +1,8 @@
-import "reflect-metadata";
-
+// src/electron/config/main.ts
 // Electron es CommonJS, necesitamos usar createRequire para cargarlo
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
-import path from "path";
+import path, { join } from "path";
 
 // Polyfill para __dirname y __filename en ES modules
 globalThis.__filename = fileURLToPath(import.meta.url);
@@ -17,16 +16,13 @@ app.disableHardwareAcceleration();
 app.commandLine.appendSwitch("disable-gpu-shader-disk-cache");
 app.commandLine.appendSwitch("disable-gpu-cache");
 
-import { join } from "path";
 import { registerAllIpcEvents } from "../ipc";
-import { AppDataSource, disconnectDatabase } from "../../backend/database/typeorm";
 
-// Since main.js and preload.cjs are both bundled into dist-electron/
+// Since main.js and preload.mjs are both bundled into dist-electron/
 // they will always be siblings in both dev and production.
 const resolvedPreloadPath = join(globalThis.__dirname, "preload.mjs");
 
 console.log("Preload Path:", resolvedPreloadPath);
-//const PRELOAD_PATH = join(__dirname, 'preload.js')
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -49,26 +45,17 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  // Initialize TypeORM connection
-  try {
-    await AppDataSource.initialize();
-    console.log("TypeORM connection established");
-  } catch (error) {
-    console.error("TypeORM initialization error:", error);
-  }
-
   registerAllIpcEvents();
   createWindow();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      //createWindow();
+      createWindow();
     }
   });
 });
 
 app.on("window-all-closed", () => {
-  disconnectDatabase()
   if (process.platform !== "darwin") {
     app.quit();
   }
