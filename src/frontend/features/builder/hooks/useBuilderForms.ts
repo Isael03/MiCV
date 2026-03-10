@@ -49,7 +49,7 @@ export const skillsSchema = z.object({
   skills: z.array(z.object({
     id: z.string(),
     name: z.string().min(1, 'La habilidad es requerida'),
-    level: z.enum(['basic', 'intermediate', 'advanced', 'native']).optional(),
+    level: z.enum(['basic', 'intermediate', 'advanced', 'native', 'soft', 'hard']).optional(),
   })).default([]),
 })
 

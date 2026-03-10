@@ -30,18 +30,76 @@ El usuario al ingresar la información en el formulario, podrá tener una previs
 
 ## Estructura de carpetas
 
-- src: Código fuente de la aplicación.  
-- docs: Documentación de la aplicación.  
-- tools: Scripts de desarrollo.  
-- database: Archivo de Base de datos.  
-- store: Imágenes.
+docs/                        # Documentación de la aplicación.   
+images/                      # Imágenes   
+src/                         # Código fuente de la aplicación.  
 
 ### Carpeta src
 
 - /frontend: Lógica y vistas de la aplicación.
 - /backend: Lógica de la aplicación.
 - /electron: Código de electron (ejemplo: main.ts).
+- /types: Interfaces y tipos de datos (ejemplo: curriculum.ts).
 
+```
+// types/curriculum.ts (Borrador)
+interface CurriculumProject {
+  id: string;
+  name: string;           // "Mi CV para Google"
+  createdAt: string;
+  updatedAt: string;
+
+  personalInfo: {
+    fullName: string;
+    email: string;
+    phone: string;
+    location: string;
+    linkedin?: string;
+    portfolio?: string;
+  };
+
+  summary?: string;
+
+  experience: {
+    id: string;
+    company: string;
+    role: string;
+    startDate: string;
+    endDate?: string;
+    current: boolean;
+    description: string;
+  }[];
+
+  education: {
+    id: string;
+    institution: string;
+    degree: string;
+    field: string;
+    startDate: string;
+    endDate?: string;
+  }[];
+
+  skills: {
+    id: string;
+    name: string;
+    level?: 'básico' | 'intermedio' | 'avanzado';
+  }[];
+
+  languages: {
+    id: string;
+    name: string;
+    level: string;
+  }[];
+
+  certifications?: {
+    id: string;
+    name: string;
+    issuer: string;
+    date: string;
+    url?: string;
+  }[];
+}
+```
 ### Carpeta electron
 
 - /config: Configuraciones de electronjs. 
@@ -76,22 +134,8 @@ features
 
 ### Carpeta src/backend
 
-Usando la arquitectura DDD separada en modulos, tambien incluye la conexión con la base de datos.
-
-### Carpeta data
-Ubicación de la base de datos.
-
-### Carpeta src/backend/database
-
-src/backend/database/connection.ts   Conexión con la base de datos.
-
-### Carpeta tools
-
-Ejemplo:
-/curriculum:
-- /dominio
-- /application
-- /infrastructure
+store/
+   projectStore.ts          # Leer/escribir JSON en disco
 
   
 ## Herramientas
@@ -102,13 +146,12 @@ Ejemplo:
 - jspdf, html2canvas
 - Nodejs 24.14.0
 - Tailwind
-- Better-sqlite
-- Prisma orm.
 - Typescript
 - Zustand
 - react-hook-form
 - zod @hookform/resolvers (Validación de formularios)
 - shadcn/ui (librería de estilos)
+- file system para lectura/escritura de archivos JSON
 
 ## Casos de uso
 
@@ -136,6 +179,3 @@ Inicio -> CV builder -> CV preview
 
 ## Diseño del curriculum
 - A definir.
-
-
-

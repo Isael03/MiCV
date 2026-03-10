@@ -1,18 +1,29 @@
 import "reflect-metadata";
-import { app, BrowserWindow } from "electron";
+
+// Electron es CommonJS, necesitamos usar createRequire para cargarlo
+import { createRequire } from "module";
+import { fileURLToPath } from "url";
+import path from "path";
+
+// Polyfill para __dirname y __filename en ES modules
+globalThis.__filename = fileURLToPath(import.meta.url);
+globalThis.__dirname = path.dirname(globalThis.__filename);
+
+const require = createRequire(import.meta.url);
+const electron = require("electron");
+const { app, BrowserWindow } = electron;
+
 app.disableHardwareAcceleration();
 app.commandLine.appendSwitch("disable-gpu-shader-disk-cache");
 app.commandLine.appendSwitch("disable-gpu-cache");
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
-import { registerAllIpcEvents } from "../ipc";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { join } from "path";
+import { registerAllIpcEvents } from "../ipc";
+import { AppDataSource, disconnectDatabase } from "../../backend/database/typeorm";
 
 // Since main.js and preload.cjs are both bundled into dist-electron/
 // they will always be siblings in both dev and production.
-const resolvedPreloadPath = join(__dirname, "preload.cjs");
+const resolvedPreloadPath = join(globalThis.__dirname, "preload.mjs");
 
 console.log("Preload Path:", resolvedPreloadPath);
 //const PRELOAD_PATH = join(__dirname, 'preload.js')
@@ -33,11 +44,19 @@ function createWindow() {
     win.loadURL(process.env.VITE_DEV_SERVER_URL);
     win.webContents.openDevTools();
   } else {
-    win.loadFile(join(__dirname, "../dist/index.html"));
+    win.loadFile(join(globalThis.__dirname, "../dist/index.html"));
   }
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // Initialize TypeORM connection
+  try {
+    await AppDataSource.initialize();
+    console.log("TypeORM connection established");
+  } catch (error) {
+    console.error("TypeORM initialization error:", error);
+  }
+
   registerAllIpcEvents();
   createWindow();
 
@@ -49,6 +68,7 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
+  disconnectDatabase()
   if (process.platform !== "darwin") {
     app.quit();
   }

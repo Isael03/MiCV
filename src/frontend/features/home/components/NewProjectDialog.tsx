@@ -11,10 +11,10 @@ export function NewProjectDialog({ isOpen, onClose, onCreate }: NewProjectDialog
 
   if (!isOpen) return null
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (name.trim()) {
-      onCreate(name.trim())
+      await onCreate(name.trim())
       setName('')
       onClose()
     }

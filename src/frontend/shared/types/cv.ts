@@ -9,28 +9,65 @@ export interface Experience {
 
 export interface Education {
   id: string
-  school: string
-  degree: string
-  year: string
+  institution: string
+  startDate: string
+  endDate: string
+  degree?: string
+  // Legacy properties for backwards compatibility
+  school?: string
+  year?: string
 }
 
 export interface Project {
   id: string
   name: string
   description: string
+  url?: string
+  technologies?: string[]
+  // Legacy property for backwards compatibility
   link?: string
 }
 
 export interface Skill {
   id: string
   name: string
-  level?: 'basic' | 'intermediate' | 'advanced' | 'native'
+  // Backend property for hard/soft skill type
+  type?: 'hard' | 'soft'
+  // Frontend property for skill level (used in forms)
+  level?: 'basic' | 'intermediate' | 'advanced' | 'native' | 'soft' | 'hard'
 }
 
 export interface Language {
   id: string
   name: string
   level: 'basic' | 'intermediate' | 'advanced' | 'native'
+}
+
+export interface PersonalInformation {
+  id: string
+  name: string
+  lastName: string
+  email: string
+  phone: string
+  address: string
+  photo?: string
+  linkedin?: string
+  github?: string
+  website?: string
+  professionalTitle?: string
+}
+
+export interface CurriculumVitae {
+  id: string
+  title: string
+  createdAt: string
+  updatedAt: string
+  personalInformation?: PersonalInformation
+  workExperiences?: Experience[]
+  educations?: Education[]
+  languages?: Language[]
+  projects?: Project[]
+  skills?: Skill[]
 }
 
 export interface CVData {
@@ -56,6 +93,25 @@ export interface CVProject {
   data: CVData
   fontFamily: string
 }
+
+// IPC Response types
+export interface IPCSuccessResponse<T> {
+  success: true
+  data: T
+}
+
+export interface IPCErrorResponse {
+  success: false
+  error: string
+}
+
+export interface IPCSuccessMessage {
+  success: true
+  message: string
+}
+
+export type IPCResponse<T> = IPCSuccessResponse<T> | IPCErrorResponse
+export type IPCMessageResponse = IPCSuccessMessage | IPCErrorResponse
 
 export const createEmptyCV = (): CVData => ({
   personalInfo: {
@@ -91,8 +147,11 @@ export const createEmptyExperience = (): Experience => ({
 
 export const createEmptyEducation = (): Education => ({
   id: crypto.randomUUID(),
-  school: '',
+  institution: '',
+  startDate: '',
+  endDate: '',
   degree: '',
+  school: '',
   year: ''
 })
 
@@ -100,16 +159,41 @@ export const createEmptyProjectItem = (): Project => ({
   id: crypto.randomUUID(),
   name: '',
   description: '',
-  link: ''
+  url: '',
+  link: '',
+  technologies: []
 })
 
 export const createEmptySkill = (): Skill => ({
   id: crypto.randomUUID(),
-  name: ''
+  name: '',
+  level: 'intermediate'
 })
 
 export const createEmptyLanguage = (): Language => ({
   id: crypto.randomUUID(),
   name: '',
   level: 'intermediate'
+})
+
+export const createEmptyPersonalInformation = (): PersonalInformation => ({
+  id: crypto.randomUUID(),
+  name: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  address: ''
+})
+
+export const createEmptyCurriculumVitae = (title: string): CurriculumVitae => ({
+  id: crypto.randomUUID(),
+  title,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  personalInformation: createEmptyPersonalInformation(),
+  workExperiences: [],
+  educations: [],
+  languages: [],
+  projects: [],
+  skills: []
 })

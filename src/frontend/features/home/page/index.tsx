@@ -12,8 +12,10 @@ function Home() {
   useEffect(()=>{
     window.cv.findAll()
   },[])
-  const handleCreateProject = (name: string) => {
+  const handleCreateProject = async (name: string) => {
     createProject(name)
+    await window.cv.createProject({title:name})
+    
   }
 
   return (

@@ -6,4 +6,5 @@ export interface ICVRepository {
   create(cv: CurriculumVitae): Promise<CurriculumVitae>;
   update(cv: CurriculumVitae): Promise<CurriculumVitae>;
   delete(id: string): Promise<void>;
+  createProjectCV(project: CurriculumVitae): Promise<CurriculumVitae>; //Solo creación inicial
 }

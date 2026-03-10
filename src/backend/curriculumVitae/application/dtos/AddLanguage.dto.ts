@@ -6,5 +6,6 @@ export class AddLanguageDTO {
   name!: string;
 
   @IsString()
+  @IsOptional()
   level?: string;
 }
