@@ -4,6 +4,7 @@ import { Header } from "../../../shared/layouts/Header";
 import { Footer } from "../../../shared/layouts/Footer";
 import { ProjectList } from "../components/ProjectList";
 import { NewProjectDialog } from "../components/NewProjectDialog";
+import { CVProject, mapBackendProjectToCVProject } from "@/shared/types/cv";
 
 function Home() {
   const { projects, createProject, deleteProject, setProjects } = useCVStore();
@@ -15,7 +16,15 @@ function Home() {
         const result = await window.cv.findAll();
 
         console.log("Proyectos cargados:", result);
-        setProjects(result.data);
+
+        if (!result.success) {
+          setProjects([]);
+          return;
+        }
+
+        const cvs: CVProject[] = result.data.map(mapBackendProjectToCVProject);
+
+        setProjects(cvs);
       } catch (error) {
         console.error("Error al cargar proyectos:", error);
       }

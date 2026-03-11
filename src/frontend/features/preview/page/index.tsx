@@ -54,10 +54,34 @@ function Preview() {
 
         <div className="bg-white shadow-lg p-8 min-h-[800px]">
           <div className="border-b pb-4 mb-4">
-            <h2 className="text-3xl font-bold text-gray-800">{cv.personalInfo.name || 'Nombre'}</h2>
+            {cv.personalInfo.professionalTitle && (
+              <p className="text-lg text-gray-600">{cv.personalInfo.professionalTitle}</p>
+            )}
+            <h2 className="text-3xl font-bold text-gray-800">{cv.personalInfo.fullName || 'Nombre'}</h2>
             <div className="text-gray-600 mt-2 space-y-1">
               {cv.personalInfo.email && <p>{cv.personalInfo.email}</p>}
               {cv.personalInfo.phone && <p>{cv.personalInfo.phone}</p>}
+              {cv.personalInfo.linkedin && (
+                <p>
+                  <a href={cv.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    LinkedIn
+                  </a>
+                </p>
+              )}
+              {cv.personalInfo.github && (
+                <p>
+                  <a href={cv.personalInfo.github} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    GitHub
+                  </a>
+                </p>
+              )}
+              {cv.personalInfo.portfolio && (
+                <p>
+                  <a href={cv.personalInfo.portfolio} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Portfolio
+                  </a>
+                </p>
+              )}
             </div>
           </div>
 
@@ -98,13 +122,30 @@ function Preview() {
           {cv.skills.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold text-gray-700 mb-2">Habilidades</h3>
-              <div className="flex flex-wrap gap-2">
-                {cv.skills.map((skill, index) => (
-                  <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                    {skill.name}
-                  </span>
-                ))}
-              </div>
+              {cv.skills.filter(s => s.type === 'Técnica').length > 0 && (
+                <div className="mb-3">
+                  <p className="text-sm font-medium text-gray-600 mb-1">Técnicas</p>
+                  <div className="flex flex-wrap gap-2">
+                    {cv.skills.filter(s => s.type === 'Técnica').map((skill) => (
+                      <span key={skill.id} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                        {skill.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {cv.skills.filter(s => s.type === 'Blanda').length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">Blandas</p>
+                  <div className="flex flex-wrap gap-2">
+                    {cv.skills.filter(s => s.type === 'Blanda').map((skill) => (
+                      <span key={skill.id} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                        {skill.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

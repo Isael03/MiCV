@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useCVStore } from '../../../store/cvStore'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Header } from '../../../shared/layouts/Header'
 import { buttonVariants } from '../../../components/ui/button'
 import { Separator } from '../../../components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs'
-import { Eye, ArrowLeft } from 'lucide-react'
+import { Eye, ArrowLeft, Save } from 'lucide-react'
 import { useBuilderForms } from '../hooks/useBuilderForms'
 import { PersonalInfoForm } from '../components/PersonalInfoForm'
 import { SummaryForm } from '../components/SummaryForm'
@@ -14,10 +14,12 @@ import { EducationForm } from '../components/EducationForm'
 import { ProjectsForm } from '../components/ProjectsForm'
 import { SkillsForm } from '../components/SkillsForm'
 import { LanguagesForm } from '../components/LanguagesForm'
+import { mapCVProjectToBackendProject } from '../../../shared/types/cv'
 
 function Builder() {
   const [searchParams] = useSearchParams()
   const projectId = searchParams.get('id')
+  const [isSaving, setIsSaving] = useState(false)
   
   const { 
     projects, 
@@ -56,6 +58,20 @@ function Builder() {
     handlePhotoUpload,
   } = useBuilderForms(cv)
 
+  const handleSave = async () => {
+    if (!currentProject) return
+    
+    setIsSaving(true)
+    try {
+      const backendProject = mapCVProjectToBackendProject(currentProject)
+      await window.cv.update({ project: backendProject })
+    } catch (error) {
+      console.error('Error al guardar:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   if (!currentProject || !cv) {
     return (
       <div className="min-h-screen bg-background">
@@ -80,13 +96,23 @@ function Builder() {
             <h1 className="text-2xl font-bold text-foreground">Editar: {currentProject.name}</h1>
             <p className="text-muted-foreground text-sm mt-1">Completa la información de tu CV</p>
           </div>
-          <Link
-            to={`/preview?id=${currentProject.id}`}
-            className={buttonVariants({ variant: 'default', size: 'sm' })}
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            Ver Preview
-          </Link>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className={buttonVariants({ variant: 'default', size: 'sm' })}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {isSaving ? 'Guardando...' : 'Guardar'}
+            </button>
+            <Link
+              to={`/preview?id=${currentProject.id}`}
+              className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              Ver Preview
+            </Link>
+          </div>
         </div>
 
         <Separator className="mb-6" />

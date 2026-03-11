@@ -6,10 +6,14 @@ import type { UseFormReturn } from 'react-hook-form'
 
 interface PersonalInfoFormProps {
   form: UseFormReturn<{
-    name: string
+    fullName: string
     email: string
     phone?: string
     photo?: string
+    linkedin?: string
+    github?: string
+    portfolio?: string
+    professionalTitle?: string
   }, any>
   photo?: string
   fileInputRef: React.RefObject<HTMLInputElement>
@@ -48,14 +52,14 @@ export function PersonalInfoForm({ form, photo, fileInputRef, onPhotoUpload }: P
         </div>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Nombre completo</Label>
+            <Label htmlFor="fullName">Nombre completo</Label>
             <Input
-              id="name"
-              {...form.register('name')}
+              id="fullName"
+              {...form.register('fullName')}
               placeholder="Juan Pérez"
             />
-            {form.formState.errors.name && (
-              <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+            {form.formState.errors.fullName && (
+              <p className="text-sm text-destructive">{form.formState.errors.fullName.message}</p>
             )}
           </div>
           <div className="grid gap-2">
@@ -77,6 +81,41 @@ export function PersonalInfoForm({ form, photo, fileInputRef, onPhotoUpload }: P
               type="tel"
               {...form.register('phone')}
               placeholder="+34 612 345 678"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="professionalTitle">Título profesional</Label>
+            <Input
+              id="professionalTitle"
+              {...form.register('professionalTitle')}
+              placeholder="Ingeniero de Software"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="linkedin">LinkedIn</Label>
+            <Input
+              id="linkedin"
+              type="url"
+              {...form.register('linkedin')}
+              placeholder="https://linkedin.com/in/juanperez"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="github">GitHub</Label>
+            <Input
+              id="github"
+              type="url"
+              {...form.register('github')}
+              placeholder="https://github.com/juanperez"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="portfolio">Portfolio / Web</Label>
+            <Input
+              id="portfolio"
+              type="url"
+              {...form.register('portfolio')}
+              placeholder="https://juanperez.dev"
             />
           </div>
         </div>

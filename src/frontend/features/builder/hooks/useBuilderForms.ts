@@ -6,10 +6,14 @@ import { useCVStore } from '../../../store/cvStore'
 import type { CVData } from '../../../shared/types/cv'
 
 export const personalInfoSchema = z.object({
-  name: z.string().min(1, 'El nombre es requerido'),
+  fullName: z.string().min(1, 'El nombre es requerido'),
   email: z.string().email('Email inválido').or(z.literal('')),
   phone: z.string().optional(),
   photo: z.string().optional(),
+  linkedin: z.string().url('URL inválida').or(z.literal('')).optional(),
+  github: z.string().url('URL inválida').or(z.literal('')).optional(),
+  portfolio: z.string().url('URL inválida').or(z.literal('')).optional(),
+  professionalTitle: z.string().optional(),
 })
 
 export const summarySchema = z.object({
@@ -49,7 +53,7 @@ export const skillsSchema = z.object({
   skills: z.array(z.object({
     id: z.string(),
     name: z.string().min(1, 'La habilidad es requerida'),
-    level: z.enum(['basic', 'intermediate', 'advanced', 'native', 'soft', 'hard']).optional(),
+    type: z.enum(['Blanda', 'Técnica']),
   })).default([]),
 })
 
@@ -69,7 +73,16 @@ export function useBuilderForms(cvData: CVData | undefined) {
 
   const personalForm = useForm({
     resolver: zodResolver(personalInfoSchema),
-    defaultValues: cvData?.personalInfo || { name: '', email: '', phone: '', photo: '' },
+    defaultValues: cvData?.personalInfo || { 
+      fullName: '', 
+      email: '', 
+      phone: '', 
+      photo: '',
+      linkedin: '',
+      github: '',
+      portfolio: '',
+      professionalTitle: '',
+    },
   })
 
   const summaryForm = useForm({
@@ -143,12 +156,25 @@ export function useBuilderForms(cvData: CVData | undefined) {
   useEffect(() => {
     const subscription = personalForm.watch((data) => {
       if (isInitializedRef.current) {
-        const d = data as { name?: string; email?: string; phone?: string; photo?: string }
+        const d = data as { 
+          fullName?: string; 
+          email?: string; 
+          phone?: string; 
+          photo?: string;
+          linkedin?: string;
+          github?: string;
+          portfolio?: string;
+          professionalTitle?: string;
+        }
         store.updatePersonalInfo({
-          name: d.name || '',
+          fullName: d.fullName || '',
           email: d.email || '',
           phone: d.phone || '',
           photo: d.photo || '',
+          linkedin: d.linkedin || '',
+          github: d.github || '',
+          portfolio: d.portfolio || '',
+          professionalTitle: d.professionalTitle || '',
         })
       }
     })
@@ -219,10 +245,10 @@ export function useBuilderForms(cvData: CVData | undefined) {
     const subscription = skillsForm.watch((data) => {
       if (isInitializedRef.current && data.skills) {
         data.skills.forEach((skill) => {
-          const skillData = skill as { id: string; name?: string; level?: 'basic' | 'intermediate' | 'advanced' | 'native' }
+          const skillData = skill as { id: string; name?: string; type?: 'Blanda' | 'Técnica' }
           store.updateSkill(skillData.id, {
             name: skillData.name ?? '',
-            level: skillData.level,
+            type: skillData.type ?? 'Técnica',
           })
         })
       }

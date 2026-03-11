@@ -31,10 +31,7 @@ export interface Project {
 export interface Skill {
   id: string;
   name: string;
-  // Backend property for hard/soft skill type
-  type?: "hard" | "soft";
-  // Frontend property for skill level (used in forms)
-  level?: "basic" | "intermediate" | "advanced" | "native" | "soft" | "hard";
+  type: "Blanda" | "Técnica";
 }
 
 export interface Language {
@@ -72,10 +69,14 @@ export interface CurriculumVitae {
 
 export interface CVData {
   personalInfo: {
-    name: string;
+    fullName: string;
     email: string;
     phone: string;
     photo?: string;
+    linkedin?: string;
+    github?: string;
+    portfolio?: string;
+    professionalTitle?: string;
   };
   summary: string;
   experience: Experience[];
@@ -101,7 +102,196 @@ export interface CVProject {
   createdAt: string;
   updatedAt: string;
   data: CVData;
-  fontFamily: string;
+  fontFamily?: string;
+}
+
+interface BackendPersonalInfo {
+  fullName: string;
+  email: string;
+  phone: string;
+  location: string;
+  linkedin?: string;
+  github?: string;
+  portfolio?: string;
+  photo?: string;
+  professionalTitle?: string;
+}
+
+interface BackendExperience {
+  id: string;
+  company: string;
+  role: string;
+  startDate: string;
+  endDate?: string;
+  current: boolean;
+  description: string;
+}
+
+interface BackendEducation {
+  id: string;
+  institution: string;
+  degree: string;
+  field?: string;
+  startDate: string;
+  endDate?: string;
+}
+
+interface BackendSkill {
+  id: string;
+  name: string;
+  type?: "Blanda" | "Técnica";
+  level?: "básico" | "intermedio" | "avanzado";
+}
+
+interface BackendLanguage {
+  id: string;
+  name: string;
+  level: "básico" | "intermedio" | "avanzado";
+}
+
+interface BackendCertification {
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
+  url?: string;
+}
+
+interface BackendProjectItem {
+  id: string;
+  name: string;
+  description: string;
+  url?: string;
+  technologies?: string[];
+}
+
+export interface BackendProject {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  personalInfo: BackendPersonalInfo;
+  summary?: string;
+  experience: BackendExperience[];
+  education: BackendEducation[];
+  skills: BackendSkill[];
+  languages: BackendLanguage[];
+  certifications?: BackendCertification[];
+  projects?: BackendProjectItem[];
+}
+
+const mapLevel = (level?: string): "basic" | "intermediate" | "advanced" | "native" => {
+  if (level === "básico") return "basic";
+  if (level === "intermedio") return "intermediate";
+  if (level === "avanzado") return "advanced";
+  return "intermediate";
+};
+
+export const mapBackendProjectToCVProject = (backend: BackendProject): CVProject => ({
+  id: backend.id,
+  name: backend.name,
+  createdAt: backend.createdAt,
+  updatedAt: backend.updatedAt,
+  data: {
+    personalInfo: {
+      fullName: backend.personalInfo.fullName || "",
+      email: backend.personalInfo.email,
+      phone: backend.personalInfo.phone,
+      photo: backend.personalInfo.photo,
+      linkedin: backend.personalInfo.linkedin,
+      github: backend.personalInfo.github,
+      portfolio: backend.personalInfo.portfolio,
+      professionalTitle: backend.personalInfo.professionalTitle,
+    },
+    summary: backend.summary || "",
+    experience: backend.experience.map((exp) => ({
+      id: exp.id,
+      company: exp.company,
+      position: exp.role,
+      startDate: exp.startDate,
+      endDate: exp.endDate || "",
+      description: exp.description,
+    })),
+    education: backend.education.map((edu) => ({
+      id: edu.id,
+      institution: edu.institution,
+      startDate: edu.startDate,
+      endDate: edu.endDate || "",
+      degree: edu.degree,
+    })),
+    projects:
+      backend.projects?.map((p) => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        url: p.url,
+        technologies: p.technologies,
+      })) || [],
+    skills: backend.skills.map((s) => ({
+      id: s.id,
+      name: s.name,
+      type: s.type === "Blanda" ? "Blanda" : "Técnica",
+    })),
+    languages: backend.languages.map((l) => ({
+      id: l.id,
+      name: l.name,
+      level: mapLevel(l.level),
+    })),
+  },
+});
+
+export const mapCVProjectToBackendProject = (cvProject: CVProject): BackendProject => {
+  return {
+    id: cvProject.id,
+    name: cvProject.name,
+    createdAt: cvProject.createdAt,
+    updatedAt: cvProject.updatedAt,
+    personalInfo: {
+      fullName: cvProject.data.personalInfo.fullName,
+      email: cvProject.data.personalInfo.email,
+      phone: cvProject.data.personalInfo.phone,
+      location: '',
+      linkedin: cvProject.data.personalInfo.linkedin,
+      github: cvProject.data.personalInfo.github,
+      portfolio: cvProject.data.personalInfo.portfolio,
+      photo: cvProject.data.personalInfo.photo,
+      professionalTitle: cvProject.data.personalInfo.professionalTitle,
+    },
+    summary: cvProject.data.summary,
+    experience: cvProject.data.experience.map(exp => ({
+      id: exp.id,
+      company: exp.company,
+      role: exp.position,
+      startDate: exp.startDate,
+      endDate: exp.endDate || undefined,
+      current: false,
+      description: exp.description,
+    })),
+    education: cvProject.data.education.map(edu => ({
+      id: edu.id,
+      institution: edu.institution,
+      degree: edu.degree || '',
+      startDate: edu.startDate,
+      endDate: edu.endDate || undefined,
+    })),
+    skills: cvProject.data.skills.map(s => ({
+      id: s.id,
+      name: s.name,
+      type: s.type,
+    })),
+    languages: cvProject.data.languages.map(l => ({
+      id: l.id,
+      name: l.name,
+      level: l.level === 'basic' ? 'básico' : l.level === 'intermediate' ? 'intermedio' : 'avanzado',
+    })),
+    projects: cvProject.data.projects?.map(p => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      url: p.url,
+      technologies: p.technologies,
+    })),
+  }
 }
 
 // IPC Response types
@@ -125,9 +315,13 @@ export type IPCMessageResponse = IPCSuccessMessage | IPCErrorResponse;
 
 export const createEmptyCV = (): CVData => ({
   personalInfo: {
-    name: "",
+    fullName: "",
     email: "",
     phone: "",
+    linkedin: "",
+    github: "",
+    portfolio: "",
+    professionalTitle: "",
   },
   summary: "",
   experience: [],
@@ -177,7 +371,7 @@ export const createEmptyProjectItem = (): Project => ({
 export const createEmptySkill = (): Skill => ({
   id: crypto.randomUUID(),
   name: "",
-  level: "intermediate",
+  type: "Técnica",
 });
 
 export const createEmptyLanguage = (): Language => ({

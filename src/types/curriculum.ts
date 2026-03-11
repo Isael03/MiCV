@@ -41,7 +41,7 @@ export interface CurriculumProject {
   skills: {
     id: string;
     name: string;
-    type?: 'Blandas' | 'Tecnicas';
+    type?: 'Blanda' | 'Técnica';
     level?: 'básico' | 'intermedio' | 'avanzado';
   }[];
 

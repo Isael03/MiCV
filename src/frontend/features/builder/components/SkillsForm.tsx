@@ -52,18 +52,16 @@ export function SkillsForm({ form, fieldArray, onRemove }: SkillsFormProps) {
                 </div>
                 <div className="w-40">
                   <Controller
-                    name={`skills.${index}.level`}
+                    name={`skills.${index}.type`}
                     control={form.control}
                     render={({ field: { onChange, value } }) => (
-                      <Select value={value || 'intermediate'} onValueChange={onChange}>
+                      <Select value={value || 'Técnica'} onValueChange={onChange}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Nivel" />
+                          <SelectValue placeholder="Tipo" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="basic">Básico</SelectItem>
-                          <SelectItem value="intermediate">Intermedio</SelectItem>
-                          <SelectItem value="advanced">Avanzado</SelectItem>
-                          <SelectItem value="native">Nativo</SelectItem>
+                          <SelectItem value="Técnica">Técnica</SelectItem>
+                          <SelectItem value="Blanda">Blanda</SelectItem>
                         </SelectContent>
                       </Select>
                     )}

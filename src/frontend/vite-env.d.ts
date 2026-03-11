@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import type { CurriculumVitae, IPCResponse, IPCMessageResponse } from './shared/types/cv';
+import type { IPCResponse, IPCMessageResponse, BackendProject } from './shared/types/cv';
 
 declare global {
   interface Window {
@@ -10,10 +10,10 @@ declare global {
     };
 
     cv: {
-      findAll: () => Promise<IPCResponse<CurriculumVitae[]>>;
-      findById: (id: string) => Promise<IPCResponse<CurriculumVitae>>;
-      createProject: (data: { title: string }) => Promise<IPCResponse<CurriculumVitae>>;
-      update: (data: { cv: CurriculumVitae; dto: unknown }) => Promise<IPCResponse<CurriculumVitae>>;
+      findAll: () => Promise<IPCResponse<BackendProject[]>>;
+      findById: (id: string) => Promise<IPCResponse<BackendProject>>;
+      createProject: (data: { title: string }) => Promise<IPCResponse<BackendProject>>;
+      update: (data: { project: BackendProject }) => Promise<IPCResponse<BackendProject>>;
       delete: (id: string) => Promise<IPCMessageResponse>;
     };
   }
