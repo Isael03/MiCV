@@ -41,11 +41,11 @@ export function EducationForm({ form, fieldArray, onRemove }: EducationFormProps
                 <div className="grid gap-2">
                   <Label>Centro educativo</Label>
                   <Input
-                    {...form.register(`education.${index}.school`)}
+                    {...form.register(`education.${index}.institution`)}
                     placeholder="Nombre del centro"
                   />
-                  {((form.formState.errors.education as any)?.[index])?.school && (
-                    <p className="text-sm text-destructive">{((form.formState.errors.education as any)?.[index])?.school?.message}</p>
+                  {((form.formState.errors.education as any)?.[index])?.institution && (
+                    <p className="text-sm text-destructive">{((form.formState.errors.education as any)?.[index])?.institution?.message}</p>
                   )}
                 </div>
                 <div className="grid gap-2">
@@ -58,12 +58,21 @@ export function EducationForm({ form, fieldArray, onRemove }: EducationFormProps
                     <p className="text-sm text-destructive">{((form.formState.errors.education as any)?.[index])?.degree?.message}</p>
                   )}
                 </div>
-                <div className="grid gap-2">
-                  <Label>Año</Label>
-                  <Input
-                    {...form.register(`education.${index}.year`)}
-                    placeholder="2020"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label>Fecha inicio</Label>
+                    <Input
+                      {...form.register(`education.${index}.startDate`)}
+                      placeholder="2020"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Fecha fin</Label>
+                    <Input
+                      {...form.register(`education.${index}.endDate`)}
+                      placeholder="2024"
+                    />
+                  </div>
                 </div>
                 <div className="flex justify-end gap-2">
                   <Button 

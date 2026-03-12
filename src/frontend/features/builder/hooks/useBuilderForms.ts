@@ -9,6 +9,7 @@ export const personalInfoSchema = z.object({
   fullName: z.string().min(1, 'El nombre es requerido'),
   email: z.string().email('Email inválido').or(z.literal('')),
   phone: z.string().optional(),
+  address: z.string().optional(),
   photo: z.string().optional(),
   linkedin: z.string().url('URL inválida').or(z.literal('')).optional(),
   github: z.string().url('URL inválida').or(z.literal('')).optional(),
@@ -34,9 +35,10 @@ export const experienceSchema = z.object({
 export const educationSchema = z.object({
   education: z.array(z.object({
     id: z.string(),
-    school: z.string().min(1, 'El centro educativo es requerido'),
+    institution: z.string().min(1, 'El centro educativo es requerido'),
     degree: z.string().min(1, 'La titulación es requerida'),
-    year: z.string().optional(),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
   })).default([]),
 })
 
@@ -45,7 +47,7 @@ export const projectsSchema = z.object({
     id: z.string(),
     name: z.string().min(1, 'El nombre del proyecto es requerido'),
     description: z.string().optional(),
-    link: z.string().optional(),
+    url: z.string().optional(),
   })).default([]),
 })
 
@@ -77,6 +79,7 @@ export function useBuilderForms(cvData: CVData | undefined) {
       fullName: '', 
       email: '', 
       phone: '', 
+      address: '',
       photo: '',
       linkedin: '',
       github: '',
@@ -160,6 +163,7 @@ export function useBuilderForms(cvData: CVData | undefined) {
           fullName?: string; 
           email?: string; 
           phone?: string; 
+          address?: string;
           photo?: string;
           linkedin?: string;
           github?: string;
@@ -170,6 +174,7 @@ export function useBuilderForms(cvData: CVData | undefined) {
           fullName: d.fullName || '',
           email: d.email || '',
           phone: d.phone || '',
+          address: d.address || '',
           photo: d.photo || '',
           linkedin: d.linkedin || '',
           github: d.github || '',
@@ -213,11 +218,12 @@ export function useBuilderForms(cvData: CVData | undefined) {
     const subscription = educationForm.watch((data) => {
       if (isInitializedRef.current && data.education) {
         data.education.forEach((edu) => {
-          const eduData = edu as { id: string; school?: string; degree?: string; year?: string }
+          const eduData = edu as { id: string; institution?: string; degree?: string; startDate?: string; endDate?: string }
           store.updateEducation(eduData.id, {
-            school: eduData.school ?? '',
+            institution: eduData.institution ?? '',
             degree: eduData.degree ?? '',
-            year: eduData.year ?? '',
+            startDate: eduData.startDate ?? '',
+            endDate: eduData.endDate ?? '',
           })
         })
       }
@@ -229,11 +235,11 @@ export function useBuilderForms(cvData: CVData | undefined) {
     const subscription = projectsForm.watch((data) => {
       if (isInitializedRef.current && data.projects) {
         data.projects.forEach((proj) => {
-          const projData = proj as { id: string; name?: string; description?: string; link?: string }
+          const projData = proj as { id: string; name?: string; description?: string; url?: string }
           store.updateProjectItem(projData.id, {
             name: projData.name ?? '',
             description: projData.description ?? '',
-            link: projData.link,
+            url: projData.url,
           })
         })
       }

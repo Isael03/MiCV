@@ -60,11 +60,11 @@ export function ProjectsForm({ form, fieldArray, onRemove }: ProjectsFormProps) 
                   <div className="grid gap-2">
                     <Label>Enlace (opcional)</Label>
                     <Input
-                      {...form.register(`projects.${index}.link`)}
+                      {...form.register(`projects.${index}.url`)}
                       placeholder="https://..."
                     />
-                    {((form.formState.errors.projects as any)?.[index])?.link && (
-                      <p className="text-sm text-destructive">{((form.formState.errors.projects as any)?.[index])?.link?.message}</p>
+                    {((form.formState.errors.projects as any)?.[index])?.url && (
+                      <p className="text-sm text-destructive">{((form.formState.errors.projects as any)?.[index])?.url?.message}</p>
                     )}
                 </div>
                 <div className="flex justify-end gap-2">

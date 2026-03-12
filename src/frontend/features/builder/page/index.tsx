@@ -4,6 +4,7 @@ import { useSearchParams, Link } from 'react-router-dom'
 import { Header } from '../../../shared/layouts/Header'
 import { buttonVariants } from '../../../components/ui/button'
 import { Separator } from '../../../components/ui/separator'
+import { Input } from '../../../components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs'
 import { Eye, ArrowLeft, Save } from 'lucide-react'
 import { useBuilderForms } from '../hooks/useBuilderForms'
@@ -20,6 +21,7 @@ function Builder() {
   const [searchParams] = useSearchParams()
   const projectId = searchParams.get('id')
   const [isSaving, setIsSaving] = useState(false)
+  const [projectTitle, setProjectTitle] = useState('')
   
   const { 
     projects, 
@@ -58,12 +60,72 @@ function Builder() {
     handlePhotoUpload,
   } = useBuilderForms(cv)
 
+  useEffect(() => {
+    if (currentProject) {
+      setProjectTitle(currentProject.name)
+    }
+  }, [currentProject])
+
   const handleSave = async () => {
     if (!currentProject) return
     
     setIsSaving(true)
     try {
-      const backendProject = mapCVProjectToBackendProject(currentProject)
+      const personalInfo = personalForm.getValues()
+      const formData = {
+        personalInfo: {
+          fullName: personalInfo.fullName || '',
+          email: personalInfo.email || '',
+          phone: personalInfo.phone || '',
+          address: personalInfo.address || '',
+          photo: personalInfo.photo,
+          linkedin: personalInfo.linkedin,
+          github: personalInfo.github,
+          portfolio: personalInfo.portfolio,
+          professionalTitle: personalInfo.professionalTitle,
+        },
+        summary: summaryForm.getValues().summary || '',
+        experience: (experienceForm.getValues().experiences || []).map(exp => ({
+          id: exp.id,
+          company: exp.company || '',
+          position: exp.position || '',
+          startDate: exp.startDate || '',
+          endDate: exp.endDate || '',
+          description: exp.description || '',
+        })),
+        education: (educationForm.getValues().education || []).map(edu => ({
+          id: edu.id,
+          institution: edu.institution || '',
+          degree: edu.degree || '',
+          startDate: edu.startDate || '',
+          endDate: edu.endDate || '',
+        })),
+        projects: (projectsForm.getValues().projects || []).map(proj => ({
+          id: proj.id,
+          name: proj.name || '',
+          description: proj.description || '',
+          url: proj.url,
+        })),
+        skills: (skillsForm.getValues().skills || []).map(skill => ({
+          id: skill.id,
+          name: skill.name || '',
+          type: skill.type || 'Técnica',
+        })),
+        languages: (languagesForm.getValues().languages || []).map(lang => ({
+          id: lang.id,
+          name: lang.name || '',
+          level: lang.level || 'basic',
+        })),
+      }
+      
+      const updatedProject = {
+        ...currentProject,
+        name: projectTitle || currentProject.name,
+        data: formData,
+        updatedAt: new Date().toISOString(),
+      }
+      
+      const backendProject = mapCVProjectToBackendProject(updatedProject)
       await window.cv.update({ project: backendProject })
     } catch (error) {
       console.error('Error al guardar:', error)
@@ -92,8 +154,13 @@ function Builder() {
       
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Editar: {currentProject.name}</h1>
+          <div className="flex-1 mr-4">
+            <Input
+              value={projectTitle}
+              onChange={(e) => setProjectTitle(e.target.value)}
+              className="text-2xl font-bold h-auto py-1 px-0 border-0 border-b border-transparent hover:border-gray-300 focus:border-gray-400 focus:ring-0 bg-transparent"
+              placeholder="Nombre del proyecto"
+            />
             <p className="text-muted-foreground text-sm mt-1">Completa la información de tu CV</p>
           </div>
           <div className="flex gap-2">

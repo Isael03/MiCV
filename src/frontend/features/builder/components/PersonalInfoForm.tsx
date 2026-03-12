@@ -9,6 +9,7 @@ interface PersonalInfoFormProps {
     fullName: string
     email: string
     phone?: string
+    address?: string
     photo?: string
     linkedin?: string
     github?: string
@@ -81,6 +82,14 @@ export function PersonalInfoForm({ form, photo, fileInputRef, onPhotoUpload }: P
               type="tel"
               {...form.register('phone')}
               placeholder="+34 612 345 678"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="address">Dirección</Label>
+            <Input
+              id="address"
+              {...form.register('address')}
+              placeholder="Calle Madrid, España"
             />
           </div>
           <div className="grid gap-2">

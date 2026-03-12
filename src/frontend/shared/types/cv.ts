@@ -72,6 +72,7 @@ export interface CVData {
     fullName: string;
     email: string;
     phone: string;
+    address?: string;
     photo?: string;
     linkedin?: string;
     github?: string;
@@ -197,6 +198,7 @@ export const mapBackendProjectToCVProject = (backend: BackendProject): CVProject
       fullName: backend.personalInfo.fullName || "",
       email: backend.personalInfo.email,
       phone: backend.personalInfo.phone,
+      address: backend.personalInfo.location,
       photo: backend.personalInfo.photo,
       linkedin: backend.personalInfo.linkedin,
       github: backend.personalInfo.github,
@@ -250,7 +252,7 @@ export const mapCVProjectToBackendProject = (cvProject: CVProject): BackendProje
       fullName: cvProject.data.personalInfo.fullName,
       email: cvProject.data.personalInfo.email,
       phone: cvProject.data.personalInfo.phone,
-      location: '',
+      location: cvProject.data.personalInfo.address || '',
       linkedin: cvProject.data.personalInfo.linkedin,
       github: cvProject.data.personalInfo.github,
       portfolio: cvProject.data.personalInfo.portfolio,
@@ -318,6 +320,7 @@ export const createEmptyCV = (): CVData => ({
     fullName: "",
     email: "",
     phone: "",
+    address: "",
     linkedin: "",
     github: "",
     portfolio: "",

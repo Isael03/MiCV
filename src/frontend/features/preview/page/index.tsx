@@ -2,15 +2,22 @@ import { useEffect } from 'react'
 import { useCVStore } from '../../../store/cvStore'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Header } from '../../../shared/layouts/Header'
+import { buttonVariants } from '../../../components/ui/button'
+import { ArrowLeft, Download, Pencil } from 'lucide-react'
+import CVDocument from '../components/CVDocument'
+import { usePdfExport } from '../hooks/usePdfExport'
+import type { CVProject } from '../../../shared/types/cv'
 
 function Preview() {
   const [searchParams] = useSearchParams()
   const projectId = searchParams.get('id')
-  
+
   const { projects, currentProjectId, setCurrentProject } = useCVStore()
-  
-  const currentProject = projects.find(p => p.id === (projectId || currentProjectId))
+
+  const currentProject = projects.find((p: CVProject) => p.id === (projectId || currentProjectId))
   const cv = currentProject?.data
+
+  const { cvRef, isExporting, exportToPdf } = usePdfExport()
 
   useEffect(() => {
     if (projectId) {
@@ -18,13 +25,20 @@ function Preview() {
     }
   }, [projectId, setCurrentProject])
 
+  const handleExportPdf = () => {
+    const fileName = currentProject
+      ? currentProject.name.replace(/\s+/g, '_').toLowerCase()
+      : 'curriculum'
+    exportToPdf(fileName)
+  }
+
   if (!currentProject || !cv) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Header />
         <div className="max-w-2xl mx-auto p-8 text-center">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Proyecto no encontrado</h2>
-          <Link to="/" className="text-blue-500 hover:underline">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Proyecto no encontrado</h2>
+          <Link to="/" className="text-primary hover:underline">
             Volver al inicio
           </Link>
         </div>
@@ -33,126 +47,49 @@ function Preview() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <Header />
-      
-      <main className="max-w-4xl mx-auto px-4 py-8">
+
+      <main className="max-w-5xl mx-auto px-4 py-8">
+        {/* ── Toolbar ── */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Preview: {currentProject.name}</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">
+              {currentProject.name}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Vista previa de tu currículum
+            </p>
+          </div>
           <div className="flex gap-3">
             <Link
               to={`/builder?id=${currentProject.id}`}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
+              className={buttonVariants({ variant: 'outline', size: 'sm' })}
             >
+              <Pencil className="w-4 h-4 mr-2" />
               Editar
             </Link>
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
-              Descargar PDF
+            <button
+              onClick={handleExportPdf}
+              disabled={isExporting}
+              className={buttonVariants({ variant: 'default', size: 'sm' })}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {isExporting ? 'Generando...' : 'Descargar PDF'}
             </button>
           </div>
         </div>
 
-        <div className="bg-white shadow-lg p-8 min-h-[800px]">
-          <div className="border-b pb-4 mb-4">
-            {cv.personalInfo.professionalTitle && (
-              <p className="text-lg text-gray-600">{cv.personalInfo.professionalTitle}</p>
-            )}
-            <h2 className="text-3xl font-bold text-gray-800">{cv.personalInfo.fullName || 'Nombre'}</h2>
-            <div className="text-gray-600 mt-2 space-y-1">
-              {cv.personalInfo.email && <p>{cv.personalInfo.email}</p>}
-              {cv.personalInfo.phone && <p>{cv.personalInfo.phone}</p>}
-              {cv.personalInfo.linkedin && (
-                <p>
-                  <a href={cv.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    LinkedIn
-                  </a>
-                </p>
-              )}
-              {cv.personalInfo.github && (
-                <p>
-                  <a href={cv.personalInfo.github} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    GitHub
-                  </a>
-                </p>
-              )}
-              {cv.personalInfo.portfolio && (
-                <p>
-                  <a href={cv.personalInfo.portfolio} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    Portfolio
-                  </a>
-                </p>
-              )}
-            </div>
-          </div>
-
-          {cv.summary && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Resumen</h3>
-              <p className="text-gray-600">{cv.summary}</p>
-            </div>
-          )}
-
-          {cv.experience.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Experiencia</h3>
-              {cv.experience.map((exp) => (
-                <div key={exp.id} className="mb-3">
-                  <p className="font-medium text-gray-800">{exp.position}</p>
-                  <p className="text-gray-600">{exp.company}</p>
-                  <p className="text-sm text-gray-500">{exp.startDate} - {exp.endDate}</p>
-                  <p className="text-gray-600 mt-1">{exp.description}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {cv.education.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Educación</h3>
-              {cv.education.map((edu) => (
-                <div key={edu.id} className="mb-3">
-                  <p className="font-medium text-gray-800">{edu.degree}</p>
-                  <p className="text-gray-600">{edu.school}</p>
-                  <p className="text-sm text-gray-500">{edu.year}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {cv.skills.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Habilidades</h3>
-              {cv.skills.filter(s => s.type === 'Técnica').length > 0 && (
-                <div className="mb-3">
-                  <p className="text-sm font-medium text-gray-600 mb-1">Técnicas</p>
-                  <div className="flex flex-wrap gap-2">
-                    {cv.skills.filter(s => s.type === 'Técnica').map((skill) => (
-                      <span key={skill.id} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                        {skill.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {cv.skills.filter(s => s.type === 'Blanda').length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Blandas</p>
-                  <div className="flex flex-wrap gap-2">
-                    {cv.skills.filter(s => s.type === 'Blanda').map((skill) => (
-                      <span key={skill.id} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                        {skill.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+        {/* ── CV Paper ── */}
+        <div className="shadow-2xl mx-auto" style={{ width: 'fit-content' }}>
+          <CVDocument ref={cvRef} cv={cv} isExporting={isExporting} />
         </div>
 
-        <div className="mt-6">
-          <Link to="/" className="text-gray-600 hover:text-gray-800 transition-colors">
-            ← Volver al inicio
+        {/* ── Back link ── */}
+        <div className="mt-8">
+          <Link to="/" className={buttonVariants({ variant: 'ghost' })}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Volver al inicio
           </Link>
         </div>
       </main>

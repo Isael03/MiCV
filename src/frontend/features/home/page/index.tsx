@@ -11,6 +11,8 @@ function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
+    let renderCount = 0;
+    console.log("renderizaciones: ", ++renderCount);
     const fetchProjects = async () => {
       try {
         const result = await window.cv.findAll();
