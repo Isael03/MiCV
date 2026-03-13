@@ -8,11 +8,13 @@ import {
   Project as PortfolioProject,
   Skill,
   Language,
+  Certification,
   createEmptyExperience,
   createEmptyEducation,
   createEmptyProjectItem,
   createEmptySkill,
   createEmptyLanguage,
+  createEmptyCertification,
 } from "../shared/types/cv";
 
 interface CVStore {
@@ -28,6 +30,9 @@ interface CVStore {
 
   // Personal Info
   updatePersonalInfo: (data: Partial<CVData["personalInfo"]>) => void;
+
+  // Design
+  updateDesign: (data: Partial<CVData["design"]>) => void;
 
   // Summary
   updateSummary: (summary: string) => void;
@@ -56,6 +61,11 @@ interface CVStore {
   addLanguage: () => void;
   updateLanguage: (id: string, data: Partial<Language>) => void;
   removeLanguage: (id: string) => void;
+
+  // Certifications
+  addCertification: () => void;
+  updateCertification: (id: string, data: Partial<Certification>) => void;
+  removeCertification: (id: string) => void;
 }
 
 export const useCVStore = create<CVStore>((set, get) => ({
@@ -126,6 +136,27 @@ export const useCVStore = create<CVStore>((set, get) => ({
               data: {
                 ...p.data,
                 personalInfo: { ...p.data.personalInfo, ...data },
+              },
+              updatedAt: new Date().toISOString(),
+            }
+          : p,
+      ),
+    });
+  },
+
+  // Design
+  updateDesign: (data) => {
+    const { currentProjectId, projects } = get();
+    if (!currentProjectId) return;
+
+    set({
+      projects: projects.map((p) =>
+        p.id === currentProjectId
+          ? {
+              ...p,
+              data: {
+                ...p.data,
+                design: { ...p.data.design, ...data },
               },
               updatedAt: new Date().toISOString(),
             }
@@ -459,6 +490,69 @@ export const useCVStore = create<CVStore>((set, get) => ({
               data: {
                 ...p.data,
                 languages: p.data.languages.filter((lang) => lang.id !== id),
+              },
+              updatedAt: new Date().toISOString(),
+            }
+          : p,
+      ),
+    });
+  },
+
+  // Certifications
+  addCertification: () => {
+    const { currentProjectId, projects } = get();
+    if (!currentProjectId) return;
+
+    set({
+      projects: projects.map((p) =>
+        p.id === currentProjectId
+          ? {
+              ...p,
+              data: {
+                ...p.data,
+                certifications: [...(p.data.certifications || []), createEmptyCertification()],
+              },
+              updatedAt: new Date().toISOString(),
+            }
+          : p,
+      ),
+    });
+  },
+
+  updateCertification: (id, data) => {
+    const { currentProjectId, projects } = get();
+    if (!currentProjectId) return;
+
+    set({
+      projects: projects.map((p) =>
+        p.id === currentProjectId
+          ? {
+              ...p,
+              data: {
+                ...p.data,
+                certifications: (p.data.certifications || []).map((cert) =>
+                  cert.id === id ? { ...cert, ...data } : cert,
+                ),
+              },
+              updatedAt: new Date().toISOString(),
+            }
+          : p,
+      ),
+    });
+  },
+
+  removeCertification: (id) => {
+    const { currentProjectId, projects } = get();
+    if (!currentProjectId) return;
+
+    set({
+      projects: projects.map((p) =>
+        p.id === currentProjectId
+          ? {
+              ...p,
+              data: {
+                ...p.data,
+                certifications: (p.data.certifications || []).filter((cert) => cert.id !== id),
               },
               updatedAt: new Date().toISOString(),
             }

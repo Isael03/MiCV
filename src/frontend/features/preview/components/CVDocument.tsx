@@ -26,6 +26,7 @@ const ICON_DATA_URIS = {
 
 import type {
   CVData,
+  Certification,
   Skill,
   Experience,
   Education,
@@ -42,6 +43,10 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
   ({ cv, isExporting }, ref) => {
     const iconPaddingTop = isExporting ? "13px" : "4px";
     const softSkills = cv.skills.filter((s: Skill) => s.type === "Blanda");
+    const certifications = (cv.certifications || []).filter(
+      (cert: Certification) =>
+        cert.name || cert.issuer || cert.date || cert.url,
+    );
     const technicalSkills = cv.skills.filter(
       (s: Skill) => s.type === "Técnica",
     );
@@ -63,7 +68,9 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
           minHeight: "297mm",
           margin: "0 auto",
           background: "#ffffff",
-          fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
+          fontFamily:
+            cv.design?.fontFamily ||
+            "'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
           color: "#000000",
           fontSize: "10pt",
           lineHeight: 1.5,
@@ -71,8 +78,38 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
           boxSizing: "border-box",
         }}
       >
+        {/* Load Google Font dynamically - only if it's not the system font */}
+        {cv.design?.fontFamily &&
+          !cv.design.fontFamily.includes("Segoe UI") && (
+            <link
+              href={`https://fonts.googleapis.com/css2?family=${cv.design.fontFamily.split(",")[0].replace(/"/g, "").replace(/ /g, "+")}:wght@400;700&display=swap`}
+              rel="stylesheet"
+            />
+          )}
         {/* ── HEADER ── */}
         <header style={{ textAlign: "center", marginBottom: "16px" }}>
+          {/* Profile photo */}
+          {cv.personalInfo.photo && (
+            <div
+              style={{
+                float: "right",
+                marginLeft: "20px",
+                marginBottom: "10px",
+              }}
+            >
+              <img
+                src={cv.personalInfo.photo}
+                alt="Profile"
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "2px solid #000000",
+                }}
+              />
+            </div>
+          )}
           <h1
             style={{
               fontSize: "22pt",
@@ -107,61 +144,181 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
             }}
           >
             {cv.personalInfo.address && (
-              <div style={{ display: "inline-table", margin: "0 10px", verticalAlign: "middle" }}>
+              <div
+                style={{
+                  display: "inline-table",
+                  margin: "0 10px",
+                  verticalAlign: "middle",
+                }}
+              >
                 <div style={{ display: "table-row" }}>
-                  <div style={{ display: "table-cell", paddingRight: "6px", paddingTop: iconPaddingTop }}>
-                    <img src={ICON_DATA_URIS.mapPin} style={{ width: "11px", height: "11px", display: "block" }} alt="" />
+                  <div
+                    style={{
+                      display: "table-cell",
+                      paddingRight: "6px",
+                      paddingTop: iconPaddingTop,
+                    }}
+                  >
+                    <img
+                      src={ICON_DATA_URIS.mapPin}
+                      style={{
+                        width: "11px",
+                        height: "11px",
+                        display: "block",
+                      }}
+                      alt=""
+                    />
                   </div>
-                  <div style={{ display: "table-cell", verticalAlign: "middle" }}>
-                    <span style={{ lineHeight: "1.1" }}>{cv.personalInfo.address}</span>
+                  <div
+                    style={{ display: "table-cell", verticalAlign: "middle" }}
+                  >
+                    <span style={{ lineHeight: "1.1" }}>
+                      {cv.personalInfo.address}
+                    </span>
                   </div>
                 </div>
               </div>
             )}
             {cv.personalInfo.email && (
-              <div style={{ display: "inline-table", margin: "0 10px", verticalAlign: "middle" }}>
+              <div
+                style={{
+                  display: "inline-table",
+                  margin: "0 10px",
+                  verticalAlign: "middle",
+                }}
+              >
                 <div style={{ display: "table-row" }}>
-                  <div style={{ display: "table-cell", paddingRight: "6px", paddingTop: iconPaddingTop }}>
-                    <img src={ICON_DATA_URIS.mail} style={{ width: "11px", height: "11px", display: "block" }} alt="" />
+                  <div
+                    style={{
+                      display: "table-cell",
+                      paddingRight: "6px",
+                      paddingTop: iconPaddingTop,
+                    }}
+                  >
+                    <img
+                      src={ICON_DATA_URIS.mail}
+                      style={{
+                        width: "11px",
+                        height: "11px",
+                        display: "block",
+                      }}
+                      alt=""
+                    />
                   </div>
-                  <div style={{ display: "table-cell", verticalAlign: "middle" }}>
-                    <span style={{ lineHeight: "1.1" }}>{cv.personalInfo.email}</span>
+                  <div
+                    style={{ display: "table-cell", verticalAlign: "middle" }}
+                  >
+                    <span style={{ lineHeight: "1.1" }}>
+                      {cv.personalInfo.email}
+                    </span>
                   </div>
                 </div>
               </div>
             )}
             {cv.personalInfo.phone && (
-              <div style={{ display: "inline-table", margin: "0 10px", verticalAlign: "middle" }}>
+              <div
+                style={{
+                  display: "inline-table",
+                  margin: "0 10px",
+                  verticalAlign: "middle",
+                }}
+              >
                 <div style={{ display: "table-row" }}>
-                  <div style={{ display: "table-cell", paddingRight: "6px", paddingTop: iconPaddingTop }}>
-                    <img src={ICON_DATA_URIS.phone} style={{ width: "11px", height: "11px", display: "block" }} alt="" />
+                  <div
+                    style={{
+                      display: "table-cell",
+                      paddingRight: "6px",
+                      paddingTop: iconPaddingTop,
+                    }}
+                  >
+                    <img
+                      src={ICON_DATA_URIS.phone}
+                      style={{
+                        width: "11px",
+                        height: "11px",
+                        display: "block",
+                      }}
+                      alt=""
+                    />
                   </div>
-                  <div style={{ display: "table-cell", verticalAlign: "middle" }}>
-                    <span style={{ lineHeight: "1.1" }}>{cv.personalInfo.phone}</span>
+                  <div
+                    style={{ display: "table-cell", verticalAlign: "middle" }}
+                  >
+                    <span style={{ lineHeight: "1.1" }}>
+                      {cv.personalInfo.phone}
+                    </span>
                   </div>
                 </div>
               </div>
             )}
             {cv.personalInfo.linkedin && (
-              <div style={{ display: "inline-table", margin: "0 10px", verticalAlign: "middle" }}>
+              <div
+                style={{
+                  display: "inline-table",
+                  margin: "0 10px",
+                  verticalAlign: "middle",
+                }}
+              >
                 <div style={{ display: "table-row" }}>
-                  <div style={{ display: "table-cell", paddingRight: "6px", paddingTop: iconPaddingTop }}>
-                    <img src={ICON_DATA_URIS.linkedin} style={{ width: "11px", height: "11px", display: "block" }} alt="" />
+                  <div
+                    style={{
+                      display: "table-cell",
+                      paddingRight: "6px",
+                      paddingTop: iconPaddingTop,
+                    }}
+                  >
+                    <img
+                      src={ICON_DATA_URIS.linkedin}
+                      style={{
+                        width: "11px",
+                        height: "11px",
+                        display: "block",
+                      }}
+                      alt=""
+                    />
                   </div>
-                  <div style={{ display: "table-cell", verticalAlign: "middle" }}>
-                    <span style={{ lineHeight: "1.1" }}>{cv.personalInfo.linkedin}</span>
+                  <div
+                    style={{ display: "table-cell", verticalAlign: "middle" }}
+                  >
+                    <span style={{ lineHeight: "1.1" }}>
+                      {cv.personalInfo.linkedin}
+                    </span>
                   </div>
                 </div>
               </div>
             )}
             {cv.personalInfo.github && (
-              <div style={{ display: "inline-table", margin: "0 10px", verticalAlign: "middle" }}>
+              <div
+                style={{
+                  display: "inline-table",
+                  margin: "0 10px",
+                  verticalAlign: "middle",
+                }}
+              >
                 <div style={{ display: "table-row" }}>
-                  <div style={{ display: "table-cell", paddingRight: "6px", paddingTop: iconPaddingTop }}>
-                    <img src={ICON_DATA_URIS.github} style={{ width: "11px", height: "11px", display: "block" }} alt="" />
+                  <div
+                    style={{
+                      display: "table-cell",
+                      paddingRight: "6px",
+                      paddingTop: iconPaddingTop,
+                    }}
+                  >
+                    <img
+                      src={ICON_DATA_URIS.github}
+                      style={{
+                        width: "11px",
+                        height: "11px",
+                        display: "block",
+                      }}
+                      alt=""
+                    />
                   </div>
-                  <div style={{ display: "table-cell", verticalAlign: "middle" }}>
-                    <span style={{ lineHeight: "1.1" }}>{cv.personalInfo.github}</span>
+                  <div
+                    style={{ display: "table-cell", verticalAlign: "middle" }}
+                  >
+                    <span style={{ lineHeight: "1.1" }}>
+                      {cv.personalInfo.github}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -224,16 +381,17 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
                   <div style={{ marginTop: "4px" }}>
                     {exp.description
                       .split("\n")
-                      .map((line: string, idx: number) => (
-                        <p
-                          key={idx}
-                          style={{ margin: "2px 0", paddingLeft: "8px" }}
-                        >
-                          {line.startsWith("•") || line.startsWith("-")
-                            ? line
-                            : `• ${line}`}
-                        </p>
-                      ))}
+                      .map((line: string, idx: number) => {
+                        const content =
+                          line.startsWith("•") || line.startsWith("-")
+                            ? line.substring(1).trim()
+                            : line;
+                        return (
+                          <ListItem key={idx} isExporting={isExporting}>
+                            {content}
+                          </ListItem>
+                        );
+                      })}
                   </div>
                 )}
               </div>
@@ -301,20 +459,16 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
                 <p style={{ fontWeight: 700, margin: 0, fontSize: "10pt" }}>
                   {proj.name}:
                 </p>
-                <ul
-                  style={{
-                    margin: "2px 0 0",
-                    paddingLeft: "24px",
-                    listStyleType: "disc",
-                  }}
-                >
-                  <li style={{ margin: 0 }}>{proj.description}</li>
+                <div style={{ marginTop: "2px" }}>
+                  <ListItem isExporting={isExporting}>
+                    {proj.description}
+                  </ListItem>
                   {proj.technologies && proj.technologies.length > 0 && (
-                    <li style={{ margin: 0 }}>
+                    <ListItem isExporting={isExporting}>
                       Herramientas: {proj.technologies.join(", ")}.
-                    </li>
+                    </ListItem>
                   )}
-                </ul>
+                </div>
               </div>
             ))}
           </Section>
@@ -323,15 +477,42 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
         {/* ── IDIOMAS ── */}
         {cv.languages.length > 0 && (
           <Section title="IDIOMAS">
-            <ul
-              style={{ margin: 0, paddingLeft: "24px", listStyleType: "disc" }}
-            >
+            <div style={{ marginTop: "2px" }}>
               {cv.languages.map((lang: Language) => (
-                <li key={lang.id} style={{ margin: "2px 0" }}>
+                <ListItem key={lang.id} isExporting={isExporting}>
                   {lang.name} {lang.level && `(${formatLevel(lang.level)})`}
-                </li>
+                </ListItem>
               ))}
-            </ul>
+            </div>
+          </Section>
+        )}
+
+        {/* ── CERTIFICADOS ── */}
+        {certifications.length > 0 && (
+          <Section title="CERTIFICADOS">
+            {certifications.map((cert: Certification, i: number) => {
+              const formattedDate = formatCertDate(cert.date);
+              const meta = [cert.issuer, formattedDate, cert.url]
+                .filter(Boolean)
+                .join(" • ");
+              return (
+                <div
+                  key={cert.id}
+                  style={{
+                    marginBottom: i < certifications.length - 1 ? "10px" : 0,
+                  }}
+                >
+                  <p style={{ fontWeight: 700, margin: 0, fontSize: "10pt" }}>
+                    {cert.name}
+                  </p>
+                  {meta && (
+                    <p style={{ margin: 0, fontSize: "9pt", color: "#000000" }}>
+                      {meta}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </Section>
         )}
       </div>
@@ -340,6 +521,42 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
 );
 
 CVDocument.displayName = "CVDocument";
+
+function ListItem({
+  children,
+  isExporting,
+}: {
+  children: React.ReactNode;
+  isExporting?: boolean;
+}) {
+  // Ajustamos el padding para el PDF - reduciendo de 10px a 4.5px
+  const bulletPaddingTop = isExporting ? "1px" : "1px";
+
+  return (
+    <div style={{ display: "table", width: "100%", marginBottom: "2px" }}>
+      <div style={{ display: "table-row" }}>
+        <div
+          style={{
+            display: "table-cell",
+            width: "16px",
+            verticalAlign: "top",
+            fontSize: "10pt", // Igualamos al tamaño del texto
+            lineHeight: "1.5", // Match the text's line-height
+            paddingTop: bulletPaddingTop,
+            paddingLeft: "4px",
+          }}
+        >
+          •
+        </div>
+        <div
+          style={{ display: "table-cell", verticalAlign: "top", textAlign: "justify" }}
+        >
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ── Section helper ── */
 function Section({
@@ -386,6 +603,46 @@ function formatLevel(level: string): string {
     avanzado: "Avanzado",
   };
   return map[level] || level;
+}
+
+function formatCertDate(value: string): string {
+  const trimmed = value?.trim();
+  if (!trimmed) return "";
+
+  const monthNames = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+
+  const isoMatch = trimmed.match(/^(\d{4})[\/-](\d{1,2})(?:[\/-]\d{1,2})?$/);
+  if (isoMatch) {
+    const year = isoMatch[1];
+    const monthIndex = Number(isoMatch[2]) - 1;
+    if (monthIndex >= 0 && monthIndex < 12) {
+      return `${monthNames[monthIndex]} - ${year}`;
+    }
+  }
+
+  const monthYearMatch = trimmed.match(/^(\d{1,2})[\/-](\d{4})$/);
+  if (monthYearMatch) {
+    const monthIndex = Number(monthYearMatch[1]) - 1;
+    const year = monthYearMatch[2];
+    if (monthIndex >= 0 && monthIndex < 12) {
+      return `${monthNames[monthIndex]} - ${year}`;
+    }
+  }
+
+  return trimmed;
 }
 
 export default CVDocument;

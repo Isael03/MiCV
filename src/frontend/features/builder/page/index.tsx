@@ -15,6 +15,8 @@ import { EducationForm } from '../components/EducationForm'
 import { ProjectsForm } from '../components/ProjectsForm'
 import { SkillsForm } from '../components/SkillsForm'
 import { LanguagesForm } from '../components/LanguagesForm'
+import { CertificatesForm } from '../components/CertificatesForm'
+import { DesignForm } from '../components/DesignForm'
 import { mapCVProjectToBackendProject } from '../../../shared/types/cv'
 
 function Builder() {
@@ -23,15 +25,16 @@ function Builder() {
   const [isSaving, setIsSaving] = useState(false)
   const [projectTitle, setProjectTitle] = useState('')
   
-  const { 
-    projects, 
-    currentProjectId, 
-    setCurrentProject, 
+  const {
+    projects,
+    currentProjectId,
+    setCurrentProject,
     removeExperience,
     removeEducation,
     removeProject,
     removeSkill,
     removeLanguage,
+    removeCertification,
   } = useCVStore()
   
   const currentProject = projects.find(p => p.id === (projectId || currentProjectId))
@@ -52,11 +55,13 @@ function Builder() {
     projectsForm,
     skillsForm,
     languagesForm,
+    certificationsForm,
     experienceArray,
     educationArray,
     projectsArray,
     skillsArray,
     languagesArray,
+    certificationsArray,
     handlePhotoUpload,
   } = useBuilderForms(cv)
 
@@ -116,6 +121,14 @@ function Builder() {
           name: lang.name || '',
           level: lang.level || 'basic',
         })),
+        certifications: (certificationsForm.getValues().certifications || []).map(cert => ({
+          id: cert.id,
+          name: cert.name || '',
+          date: cert.date || '',
+          issuer: cert.issuer || '',
+          url: cert.url || '',
+        })),
+        design: currentProject.data.design,
       }
       
       const updatedProject = {
@@ -185,7 +198,7 @@ function Builder() {
         <Separator className="mb-6" />
 
         <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-9">
             <TabsTrigger value="personal">Personal</TabsTrigger>
             <TabsTrigger value="summary">Sobre mí</TabsTrigger>
             <TabsTrigger value="experience">Experiencia</TabsTrigger>
@@ -193,6 +206,8 @@ function Builder() {
             <TabsTrigger value="projects">Proyectos</TabsTrigger>
             <TabsTrigger value="skills">Habilidades</TabsTrigger>
             <TabsTrigger value="languages">Idiomas</TabsTrigger>
+            <TabsTrigger value="certificates">Certificados</TabsTrigger>
+            <TabsTrigger value="design">Diseño</TabsTrigger>
           </TabsList>
 
           <TabsContent value="personal" className="mt-6">
@@ -241,11 +256,23 @@ function Builder() {
           </TabsContent>
 
           <TabsContent value="languages" className="mt-6">
-            <LanguagesForm 
-              form={languagesForm} 
-              fieldArray={languagesArray} 
-              onRemove={removeLanguage} 
+            <LanguagesForm
+              form={languagesForm}
+              fieldArray={languagesArray}
+              onRemove={removeLanguage}
             />
+          </TabsContent>
+
+          <TabsContent value="certificates" className="mt-6">
+            <CertificatesForm
+              form={certificationsForm}
+              fieldArray={certificationsArray}
+              onRemove={removeCertification}
+            />
+          </TabsContent>
+
+          <TabsContent value="design" className="mt-6">
+            <DesignForm />
           </TabsContent>
         </Tabs>
 

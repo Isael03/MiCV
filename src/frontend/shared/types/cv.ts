@@ -67,6 +67,10 @@ export interface CurriculumVitae {
   skills?: Skill[];
 }
 
+export interface DesignSettings {
+  fontFamily: string;
+}
+
 export interface CVData {
   personalInfo: {
     fullName: string;
@@ -86,16 +90,16 @@ export interface CVData {
   skills: Skill[];
   languages: Language[];
   certifications?: Certification[];
+  design: DesignSettings;
 }
 
 export interface Certification {
   id: string;
   name: string;
-  issuer: string;
   date: string;
+  issuer?: string;
   url?: string;
 }
-[];
 
 export interface CVProject {
   id: string;
@@ -103,7 +107,6 @@ export interface CVProject {
   createdAt: string;
   updatedAt: string;
   data: CVData;
-  fontFamily?: string;
 }
 
 interface BackendPersonalInfo {
@@ -153,8 +156,8 @@ interface BackendLanguage {
 interface BackendCertification {
   id: string;
   name: string;
-  issuer: string;
   date: string;
+  issuer?: string;
   url?: string;
 }
 
@@ -179,16 +182,23 @@ export interface BackendProject {
   languages: BackendLanguage[];
   certifications?: BackendCertification[];
   projects?: BackendProjectItem[];
+  design?: {
+    fontFamily?: string;
+  };
 }
 
-const mapLevel = (level?: string): "basic" | "intermediate" | "advanced" | "native" => {
+const mapLevel = (
+  level?: string,
+): "basic" | "intermediate" | "advanced" | "native" => {
   if (level === "básico") return "basic";
   if (level === "intermedio") return "intermediate";
   if (level === "avanzado") return "advanced";
   return "intermediate";
 };
 
-export const mapBackendProjectToCVProject = (backend: BackendProject): CVProject => ({
+export const mapBackendProjectToCVProject = (
+  backend: BackendProject,
+): CVProject => ({
   id: backend.id,
   name: backend.name,
   createdAt: backend.createdAt,
@@ -239,10 +249,22 @@ export const mapBackendProjectToCVProject = (backend: BackendProject): CVProject
       name: l.name,
       level: mapLevel(l.level),
     })),
+    certifications: backend.certifications?.map((c) => ({
+      id: c.id,
+      name: c.name,
+      date: c.date,
+      issuer: c.issuer,
+      url: c.url,
+    })) || [],
+    design: {
+      fontFamily: backend.design?.fontFamily || "Inter",
+    },
   },
 });
 
-export const mapCVProjectToBackendProject = (cvProject: CVProject): BackendProject => {
+export const mapCVProjectToBackendProject = (
+  cvProject: CVProject,
+): BackendProject => {
   return {
     id: cvProject.id,
     name: cvProject.name,
@@ -252,7 +274,7 @@ export const mapCVProjectToBackendProject = (cvProject: CVProject): BackendProje
       fullName: cvProject.data.personalInfo.fullName,
       email: cvProject.data.personalInfo.email,
       phone: cvProject.data.personalInfo.phone,
-      location: cvProject.data.personalInfo.address || '',
+      location: cvProject.data.personalInfo.address || "",
       linkedin: cvProject.data.personalInfo.linkedin,
       github: cvProject.data.personalInfo.github,
       portfolio: cvProject.data.personalInfo.portfolio,
@@ -260,7 +282,7 @@ export const mapCVProjectToBackendProject = (cvProject: CVProject): BackendProje
       professionalTitle: cvProject.data.personalInfo.professionalTitle,
     },
     summary: cvProject.data.summary,
-    experience: cvProject.data.experience.map(exp => ({
+    experience: cvProject.data.experience.map((exp) => ({
       id: exp.id,
       company: exp.company,
       role: exp.position,
@@ -269,32 +291,61 @@ export const mapCVProjectToBackendProject = (cvProject: CVProject): BackendProje
       current: false,
       description: exp.description,
     })),
-    education: cvProject.data.education.map(edu => ({
+    education: cvProject.data.education.map((edu) => ({
       id: edu.id,
       institution: edu.institution,
-      degree: edu.degree || '',
+      degree: edu.degree || "",
       startDate: edu.startDate,
       endDate: edu.endDate || undefined,
     })),
-    skills: cvProject.data.skills.map(s => ({
+    skills: cvProject.data.skills.map((s) => ({
       id: s.id,
       name: s.name,
       type: s.type,
     })),
-    languages: cvProject.data.languages.map(l => ({
+    languages: cvProject.data.languages.map((l) => ({
       id: l.id,
       name: l.name,
-      level: l.level === 'basic' ? 'básico' : l.level === 'intermediate' ? 'intermedio' : 'avanzado',
+      level:
+        l.level === "basic"
+          ? "básico"
+          : l.level === "intermediate"
+            ? "intermedio"
+            : "avanzado",
     })),
-    projects: cvProject.data.projects?.map(p => ({
+    projects: cvProject.data.projects?.map((p) => ({
       id: p.id,
       name: p.name,
       description: p.description,
       url: p.url,
       technologies: p.technologies,
     })),
-  }
-}
+    certifications: cvProject.data.certifications?.map((c) => ({
+      id: c.id,
+      name: c.name,
+      date: c.date,
+      issuer: c.issuer,
+      url: c.url,
+    })),
+    design: {
+      fontFamily: cvProject.data.design.fontFamily,
+    },
+  };
+};
+
+export const AVAILABLE_FONTS = [
+  {
+    name: "Sistema (Original)",
+    value: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
+  },
+  { name: "Inter", value: "Inter, sans-serif" },
+  { name: "Roboto", value: "Roboto, sans-serif" },
+  { name: "Open Sans", value: '"Open Sans", sans-serif' },
+  { name: "Montserrat", value: "Montserrat, sans-serif" },
+  { name: "Playfair Display", value: '"Playfair Display", serif' },
+  { name: "Merriweather", value: "Merriweather, serif" },
+  { name: "Lora", value: "Lora, serif" },
+];
 
 // IPC Response types
 export interface IPCSuccessResponse<T> {
@@ -332,6 +383,10 @@ export const createEmptyCV = (): CVData => ({
   projects: [],
   skills: [],
   languages: [],
+  certifications: [],
+  design: {
+    fontFamily: "Inter",
+  },
 });
 
 export const createEmptyProject = (name: string): CVProject => ({
@@ -340,7 +395,6 @@ export const createEmptyProject = (name: string): CVProject => ({
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   data: createEmptyCV(),
-  fontFamily: "Arial",
 });
 
 export const createEmptyExperience = (): Experience => ({
@@ -381,6 +435,14 @@ export const createEmptyLanguage = (): Language => ({
   id: crypto.randomUUID(),
   name: "",
   level: "intermediate",
+});
+
+export const createEmptyCertification = (): Certification => ({
+  id: crypto.randomUUID(),
+  name: "",
+  date: "",
+  issuer: "",
+  url: "",
 });
 
 export const createEmptyPersonalInformation = (): PersonalInformation => ({

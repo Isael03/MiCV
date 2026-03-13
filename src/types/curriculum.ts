@@ -1,7 +1,7 @@
 // src/types/curriculum.ts
 export interface CurriculumProject {
   id: string;
-  name: string;           // "Mi CV para Google"
+  name: string; // "Mi CV para Google"
   createdAt: string;
   updatedAt: string;
 
@@ -41,21 +41,21 @@ export interface CurriculumProject {
   skills: {
     id: string;
     name: string;
-    type?: 'Blanda' | 'Técnica';
-    level?: 'básico' | 'intermedio' | 'avanzado';
+    type?: "Blanda" | "Técnica";
+    level?: "básico" | "intermedio" | "avanzado";
   }[];
 
   languages: {
     id: string;
     name: string;
-    level: 'básico' | 'intermedio' | 'avanzado';
+    level: "básico" | "intermedio" | "avanzado";
   }[];
 
   certifications?: {
     id: string;
     name: string;
-    issuer: string;
     date: string;
+    issuer?: string;
     url?: string;
   }[];
 

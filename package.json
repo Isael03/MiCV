@@ -64,7 +64,13 @@
       "dist-electron/**/*"
     ],
     "win": {
-      "target": "nsis"
+      "target": "portable"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
     }
   }
 }

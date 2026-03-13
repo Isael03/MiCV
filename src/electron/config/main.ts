@@ -25,15 +25,29 @@ const resolvedPreloadPath = join(globalThis.__dirname, "preload.mjs");
 console.log("Preload Path:", resolvedPreloadPath);
 
 function createWindow() {
+  // Determinar si estamos en modo desarrollo
+  const isDev = !!process.env.VITE_DEV_SERVER_URL;
+
   const win = new BrowserWindow({
     width: 1200,
+
     height: 800,
+
+    menuBarVisibility: isDev,
     webPreferences: {
       preload: resolvedPreloadPath,
+
       contextIsolation: true,
+
       nodeIntegration: true,
     },
   });
+
+  // Deshabilitar el menú en producción
+
+  if (!isDev) {
+    win.removeMenu();
+  }
 
   if (process.env.VITE_DEV_SERVER_URL) {
     console.log("Loading dev server:", process.env.VITE_DEV_SERVER_URL);
