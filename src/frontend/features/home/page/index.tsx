@@ -4,11 +4,14 @@ import { Header } from "../../../shared/layouts/Header";
 import { Footer } from "../../../shared/layouts/Footer";
 import { ProjectList } from "../components/ProjectList";
 import { NewProjectDialog } from "../components/NewProjectDialog";
+import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { CVProject, mapBackendProjectToCVProject } from "@/shared/types/cv";
 
 function Home() {
   const { projects, createProject, deleteProject, setProjects } = useCVStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<CVProject | null>(null);
 
   const loadProjects = async () => {
     try {
@@ -35,6 +38,31 @@ function Home() {
     createProject(name);
     await window.cv.createProject({ title: name });
     await loadProjects();
+  };
+
+  const handleDeleteClick = (project: CVProject) => {
+    setProjectToDelete(project);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!projectToDelete) return;
+
+    try {
+      const result = await window.cv.delete(projectToDelete.id);
+      if (result.success) {
+        deleteProject(projectToDelete.id);
+      } else {
+        console.error("Error al eliminar proyecto:", result.error);
+        alert("No se pudo eliminar el proyecto");
+      }
+    } catch (error) {
+      console.error("Error al eliminar proyecto:", error);
+      alert("Error al intentar eliminar el proyecto");
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setProjectToDelete(null);
+    }
   };
 
   const handleDuplicateProject = async (id: string) => {
@@ -86,7 +114,11 @@ function Home() {
           </button>
         </div>
 
-        <ProjectList projects={projects} onDelete={deleteProject} onDuplicate={handleDuplicateProject} />
+        <ProjectList
+          projects={projects}
+          onDelete={handleDeleteClick}
+          onDuplicate={handleDuplicateProject}
+        />
       </main>
 
       <Footer />
@@ -95,6 +127,13 @@ function Home() {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         onCreate={handleCreateProject}
+      />
+
+      <DeleteConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        projectName={projectToDelete?.name || ""}
       />
     </div>
   );

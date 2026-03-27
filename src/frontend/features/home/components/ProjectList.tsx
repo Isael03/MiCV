@@ -3,7 +3,7 @@ import { ProjectCard } from './ProjectCard'
 
 interface ProjectListProps {
   projects: CVProject[]
-  onDelete: (id: string) => void
+  onDelete: (project: CVProject) => void
   onDuplicate: (id: string) => void
 }
 

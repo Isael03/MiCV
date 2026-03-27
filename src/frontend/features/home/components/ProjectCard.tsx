@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 interface ProjectCardProps {
   project: CVProject
-  onDelete: (id: string) => void
+  onDelete: (project: CVProject) => void
   onDuplicate: (id: string) => void
 }
 
@@ -29,7 +29,7 @@ export function ProjectCard({ project, onDelete, onDuplicate }: ProjectCardProps
             </svg>
           </button>
           <button
-            onClick={() => onDelete(project.id)}
+            onClick={() => onDelete(project)}
             className="text-gray-400 hover:text-red-500 transition-colors p-1"
             title="Eliminar"
           >
