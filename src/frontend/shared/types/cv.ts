@@ -71,6 +71,25 @@ export interface DesignSettings {
   fontFamily: string;
 }
 
+export type CVSectionKey =
+  | "summary"
+  | "experience"
+  | "education"
+  | "skills"
+  | "projects"
+  | "languages"
+  | "certifications";
+
+export const DEFAULT_SECTION_ORDER: CVSectionKey[] = [
+  "summary",
+  "experience",
+  "education",
+  "skills",
+  "projects",
+  "languages",
+  "certifications",
+];
+
 export interface CVData {
   personalInfo: {
     fullName: string;
@@ -90,6 +109,8 @@ export interface CVData {
   skills: Skill[];
   languages: Language[];
   certifications?: Certification[];
+  sectionOrder: CVSectionKey[];
+  hiddenSections: CVSectionKey[];
   design: DesignSettings;
 }
 
@@ -182,6 +203,8 @@ export interface BackendProject {
   languages: BackendLanguage[];
   certifications?: BackendCertification[];
   projects?: BackendProjectItem[];
+  sectionOrder?: CVSectionKey[];
+  hiddenSections?: CVSectionKey[];
   design?: {
     fontFamily?: string;
   };
@@ -256,6 +279,10 @@ export const mapBackendProjectToCVProject = (
       issuer: c.issuer,
       url: c.url,
     })) || [],
+    sectionOrder: backend.sectionOrder
+      ? [...backend.sectionOrder]
+      : [...DEFAULT_SECTION_ORDER],
+    hiddenSections: backend.hiddenSections ? [...backend.hiddenSections] : [],
     design: {
       fontFamily: backend.design?.fontFamily || "Inter",
     },
@@ -327,6 +354,8 @@ export const mapCVProjectToBackendProject = (
       issuer: c.issuer,
       url: c.url,
     })),
+    sectionOrder: cvProject.data.sectionOrder,
+    hiddenSections: cvProject.data.hiddenSections,
     design: {
       fontFamily: cvProject.data.design.fontFamily,
     },
@@ -384,6 +413,8 @@ export const createEmptyCV = (): CVData => ({
   skills: [],
   languages: [],
   certifications: [],
+  sectionOrder: [...DEFAULT_SECTION_ORDER],
+  hiddenSections: [],
   design: {
     fontFamily: "Inter",
   },

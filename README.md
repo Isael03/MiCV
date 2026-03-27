@@ -69,6 +69,9 @@ Esto generará instaladores para Windows en la carpeta `release`.
 10. Previsualiza tu CV
 11. Exporta a PDF cuando estés satisfecho
 
+## Notas
+- En la ruta ``` C:\Users\[usuario]\AppData\Roaming\cv_builder\projectsCV en windows se guardan los proyectos (.json).```
+
 ## Estructura del Proyecto
 
 ```

@@ -9,6 +9,7 @@ import {
   Skill,
   Language,
   Certification,
+  CVSectionKey,
   createEmptyExperience,
   createEmptyEducation,
   createEmptyProjectItem,
@@ -33,6 +34,8 @@ interface CVStore {
 
   // Design
   updateDesign: (data: Partial<CVData["design"]>) => void;
+  updateSectionOrder: (order: CVSectionKey[]) => void;
+  updateHiddenSections: (hidden: CVSectionKey[]) => void;
 
   // Summary
   updateSummary: (summary: string) => void;
@@ -158,6 +161,38 @@ export const useCVStore = create<CVStore>((set, get) => ({
                 ...p.data,
                 design: { ...p.data.design, ...data },
               },
+              updatedAt: new Date().toISOString(),
+            }
+          : p,
+      ),
+    });
+  },
+  updateSectionOrder: (order) => {
+    const { currentProjectId, projects } = get();
+    if (!currentProjectId) return;
+
+    set({
+      projects: projects.map((p) =>
+        p.id === currentProjectId
+          ? {
+              ...p,
+              data: { ...p.data, sectionOrder: order },
+              updatedAt: new Date().toISOString(),
+            }
+          : p,
+      ),
+    });
+  },
+  updateHiddenSections: (hidden) => {
+    const { currentProjectId, projects } = get();
+    if (!currentProjectId) return;
+
+    set({
+      projects: projects.map((p) =>
+        p.id === currentProjectId
+          ? {
+              ...p,
+              data: { ...p.data, hiddenSections: hidden },
               updatedAt: new Date().toISOString(),
             }
           : p,

@@ -10,33 +10,46 @@ function Home() {
   const { projects, createProject, deleteProject, setProjects } = useCVStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  useEffect(() => {
-    let renderCount = 0;
-    console.log("renderizaciones: ", ++renderCount);
-    const fetchProjects = async () => {
-      try {
-        const result = await window.cv.findAll();
+  const loadProjects = async () => {
+    try {
+      const result = await window.cv.findAll();
+      console.log("Proyectos cargados:", result);
 
-        console.log("Proyectos cargados:", result);
-
-        if (!result.success) {
-          setProjects([]);
-          return;
-        }
-
-        const cvs: CVProject[] = result.data.map(mapBackendProjectToCVProject);
-
-        setProjects(cvs);
-      } catch (error) {
-        console.error("Error al cargar proyectos:", error);
+      if (!result.success) {
+        setProjects([]);
+        return;
       }
-    };
-    fetchProjects();
+
+      const cvs: CVProject[] = result.data.map(mapBackendProjectToCVProject);
+      setProjects(cvs);
+    } catch (error) {
+      console.error("Error al cargar proyectos:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadProjects();
   }, []);
 
   const handleCreateProject = async (name: string) => {
     createProject(name);
     await window.cv.createProject({ title: name });
+    await loadProjects();
+  };
+
+  const handleDuplicateProject = async (id: string) => {
+    try {
+      const result = await window.cv.duplicateProject(id);
+      if (result.success) {
+        await loadProjects();
+      } else {
+        console.error("Error al duplicar proyecto:", result.error);
+        alert("No se pudo duplicar el proyecto");
+      }
+    } catch (error) {
+      console.error("Error al duplicar proyecto:", error);
+      alert("Error al intentar duplicar el proyecto");
+    }
   };
 
   return (
@@ -73,7 +86,7 @@ function Home() {
           </button>
         </div>
 
-        <ProjectList projects={projects} onDelete={deleteProject} />
+        <ProjectList projects={projects} onDelete={deleteProject} onDuplicate={handleDuplicateProject} />
       </main>
 
       <Footer />

@@ -8,7 +8,7 @@ release
 .agents
 opencode.json
 skills-lock.json
-
+.codex
 
 release
 design

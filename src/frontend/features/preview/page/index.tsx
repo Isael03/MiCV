@@ -52,7 +52,7 @@ function Preview() {
 
       <main className="max-w-5xl mx-auto px-4 py-8">
         {/* ── Toolbar ── */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground">
               {currentProject.name}
@@ -61,7 +61,7 @@ function Preview() {
               Vista previa de tu currículum
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Link
               to={`/builder?id=${currentProject.id}`}
               className={buttonVariants({ variant: 'outline', size: 'sm' })}
@@ -81,8 +81,10 @@ function Preview() {
         </div>
 
         {/* ── CV Paper ── */}
-        <div className="shadow-2xl mx-auto" style={{ width: 'fit-content' }}>
-          <CVDocument ref={cvRef} cv={cv} isExporting={isExporting} />
+        <div className="shadow-2xl mx-auto w-full overflow-x-auto">
+          <div className="w-full min-w-[280px] flex justify-center">
+            <CVDocument ref={cvRef} cv={cv} isExporting={isExporting} />
+          </div>
         </div>
 
         {/* ── Back link ── */}

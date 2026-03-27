@@ -15,6 +15,7 @@ declare global {
       createProject: (data: { title: string }) => Promise<IPCResponse<BackendProject>>;
       update: (data: { project: BackendProject }) => Promise<IPCResponse<BackendProject>>;
       delete: (id: string) => Promise<IPCMessageResponse>;
+      duplicateProject: (id: string) => Promise<IPCResponse<BackendProject>>;
     };
   }
 }

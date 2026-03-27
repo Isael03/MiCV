@@ -15,4 +15,5 @@ contextBridge.exposeInMainWorld("cv", {
     ipcRenderer.invoke("cv:createProject", data),
   update: (data: any) => ipcRenderer.invoke("cv:update", data),
   delete: (id: string) => ipcRenderer.invoke("cv:delete", id),
+  duplicateProject: (id: string) => ipcRenderer.invoke("cv:duplicateProject", id),
 });

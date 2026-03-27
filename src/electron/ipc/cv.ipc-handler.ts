@@ -105,4 +105,32 @@ export const registerCVIpc = () => {
       };
     }
   });
+
+  ipcMain.handle("cv:duplicateProject", async (_event: any, id: string) => {
+    try {
+      const originalProject = await projectStore.findById(id);
+      if (!originalProject) {
+        return { success: false, error: "Project not found" };
+      }
+
+      const newId = crypto.randomUUID();
+      const now = new Date().toISOString();
+      const duplicatedProject: CurriculumProject = {
+        ...originalProject,
+        id: newId,
+        name: `${originalProject.name} (copia)`,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      await projectStore.save(duplicatedProject);
+      return { success: true, data: duplicatedProject };
+    } catch (error) {
+      console.error("Error in cv:duplicateProject:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  });
 };

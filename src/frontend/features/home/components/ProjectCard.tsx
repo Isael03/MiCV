@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom'
 interface ProjectCardProps {
   project: CVProject
   onDelete: (id: string) => void
+  onDuplicate: (id: string) => void
 }
 
-export function ProjectCard({ project, onDelete }: ProjectCardProps) {
+export function ProjectCard({ project, onDelete, onDuplicate }: ProjectCardProps) {
   const formattedDate = new Date(project.createdAt).toLocaleDateString('es-ES', {
     day: '2-digit',
     month: '2-digit',
@@ -17,15 +18,26 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 border border-gray-200">
       <div className="flex items-start justify-between mb-2">
         <h3 className="font-bold text-base text-gray-800 truncate flex-1">{project.name}</h3>
-        <button
-          onClick={() => onDelete(project.id)}
-          className="text-red-500 hover:text-red-700 transition-colors p-1"
-          title="Eliminar"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => onDuplicate(project.id)}
+            className="text-gray-400 hover:text-blue-500 transition-colors p-1"
+            title="Duplicar"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+            </svg>
+          </button>
+          <button
+            onClick={() => onDelete(project.id)}
+            className="text-gray-400 hover:text-red-500 transition-colors p-1"
+            title="Eliminar"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
       
       <div className="text-xs text-gray-500 mb-3">

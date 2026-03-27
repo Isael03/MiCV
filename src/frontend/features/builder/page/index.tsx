@@ -17,7 +17,7 @@ import { SkillsForm } from '../components/SkillsForm'
 import { LanguagesForm } from '../components/LanguagesForm'
 import { CertificatesForm } from '../components/CertificatesForm'
 import { DesignForm } from '../components/DesignForm'
-import { mapCVProjectToBackendProject } from '../../../shared/types/cv'
+import { DEFAULT_SECTION_ORDER, mapCVProjectToBackendProject } from '../../../shared/types/cv'
 
 function Builder() {
   const [searchParams] = useSearchParams()
@@ -128,6 +128,8 @@ function Builder() {
           issuer: cert.issuer || '',
           url: cert.url || '',
         })),
+        sectionOrder: currentProject.data.sectionOrder || DEFAULT_SECTION_ORDER,
+        hiddenSections: currentProject.data.hiddenSections || [],
         design: currentProject.data.design,
       }
       
@@ -166,8 +168,8 @@ function Builder() {
       <Header />
       
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex-1 mr-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div className="flex-1">
             <Input
               value={projectTitle}
               onChange={(e) => setProjectTitle(e.target.value)}
@@ -176,7 +178,7 @@ function Builder() {
             />
             <p className="text-muted-foreground text-sm mt-1">Completa la información de tu CV</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={handleSave}
               disabled={isSaving}
@@ -198,7 +200,7 @@ function Builder() {
         <Separator className="mb-6" />
 
         <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="grid w-full grid-cols-9">
+          <TabsList className="!h-auto w-full flex flex-wrap items-start gap-2 justify-start py-2 [&_[data-slot=tabs-trigger]]:flex-none">
             <TabsTrigger value="personal">Personal</TabsTrigger>
             <TabsTrigger value="summary">Sobre mí</TabsTrigger>
             <TabsTrigger value="experience">Experiencia</TabsTrigger>
