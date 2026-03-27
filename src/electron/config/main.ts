@@ -10,7 +10,13 @@ globalThis.__dirname = path.dirname(globalThis.__filename);
 
 const require = createRequire(import.meta.url);
 const electron = require("electron");
-const { app, BrowserWindow } = electron;
+const { app, BrowserWindow, Menu } = electron;
+
+const isDev = !!process.env.VITE_DEV_SERVER_URL;
+
+if (!isDev) {
+  Menu.setApplicationMenu(null);
+}
 
 app.disableHardwareAcceleration();
 app.commandLine.appendSwitch("disable-gpu-shader-disk-cache");
@@ -25,9 +31,6 @@ const resolvedPreloadPath = join(globalThis.__dirname, "preload.mjs");
 console.log("Preload Path:", resolvedPreloadPath);
 
 function createWindow() {
-  // Determinar si estamos en modo desarrollo
-  const isDev = !!process.env.VITE_DEV_SERVER_URL;
-
   const win = new BrowserWindow({
     width: 1200,
 
@@ -43,13 +46,7 @@ function createWindow() {
     },
   });
 
-  // Deshabilitar el menú en producción
-
-  if (!isDev) {
-    win.removeMenu();
-  }
-
-  if (process.env.VITE_DEV_SERVER_URL) {
+  if (isDev) {
     console.log("Loading dev server:", process.env.VITE_DEV_SERVER_URL);
     win.loadURL(process.env.VITE_DEV_SERVER_URL);
     win.webContents.openDevTools();
