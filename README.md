@@ -6,7 +6,7 @@ Una aplicación de escritorio para crear y gestionar currículums vitae profesio
 
 - 💾 **Almacenamiento Local**: Tus datos se guardan localmente en tu dispositivo
 - 📄 **Exportación a PDF**: Exporta tu CV en formato PDF
-- 🖼️ **Previsualización en Vivo**: Ve cómo se ve tu CV antes de exportarlo
+- 🖼️ **Previsualización**: Ve cómo se ve tu CV antes de exportarlo
 - 📱 **Responsive**: Funciona bien en diferentes tamaños de pantalla
 - ⚡ **Rápido**: Aplicación de escritorio construida con Electron
 
