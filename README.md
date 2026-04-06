@@ -5,10 +5,10 @@ Una aplicación de escritorio para crear y gestionar currículums vitae profesio
 ## Características
 
 - 💾 **Almacenamiento Local**: Tus datos se guardan localmente en tu dispositivo
-- 📄 **Exportación a PDF**: Exporta tu CV en formato PDF de alta calidad
-- 🖼️ **Previsualización en Vivo**: Ve cómo se ve tu CV antes de exportarlo
+- 📄 **Exportación a PDF**: Exporta tu CV en formato PDF
+- 🖼️ **Previsualización**: Ve cómo se ve tu CV antes de exportarlo
 - 📱 **Responsive**: Funciona bien en diferentes tamaños de pantalla
-- ⚡ **Rápido y Ligero**: Aplicación de escritorio construida con Electron
+- ⚡ **Rápido**: Aplicación de escritorio construida con Electron
 
 ## Tecnologías
 
@@ -24,7 +24,7 @@ Una aplicación de escritorio para crear y gestionar currículums vitae profesio
 
 ### Prerrequisitos
 
-- Node.js >= 16.x
+- Node.js >= 24.11.1
 - npm o yarn
 
 ### Desarrollo
@@ -71,6 +71,8 @@ Esto generará instaladores para Windows en la carpeta `release`.
 
 ## Notas
 - En la ruta ``` C:\Users\[usuario]\AppData\Roaming\cv_builder\projectsCV en windows se guardan los proyectos (.json).```
+- Este software esta hecho con vibecoding.
+- Solo soporta un estilo de CV.
 
 ## Estructura del Proyecto
 
@@ -86,8 +88,6 @@ src/
 │   └── store/        # Manejo de estado
 └── types/            # Definiciones de tipos TypeScript (para el backend)
 ```
+## Screenshot
 
-
-## Capturas de Pantalla
-
-*(Aquí irían capturas de pantalla de la aplicación)*
+![](./screenshots/screen-1.png)

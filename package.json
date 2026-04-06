@@ -7,7 +7,6 @@
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
     "preview": "vite preview",
-    "electron:dev": "vite",
     "electron:build": "vite build && electron-builder"
   },
   "keywords": [],
