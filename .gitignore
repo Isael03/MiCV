@@ -9,12 +9,8 @@ release
 opencode.json
 skills-lock.json
 .codex
-AGENT.MD
-AGENTS.MD
-<<<<<<< HEAD
-
-=======
+AGENT.md
+AGENTS.md
 docs/Resume.md
->>>>>>> dev
 release
 design
