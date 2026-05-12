@@ -101,6 +101,12 @@ export const certificationsSchema = z.object({
     .default([]),
 });
 
+export const salarySchema = z.object({
+  amount: z.string().optional(),
+  isNegotiable: z.boolean().default(false),
+});
+
+
 export function useBuilderForms(cvData: CVData | undefined) {
   const store = useCVStore();
 
@@ -157,6 +163,12 @@ export function useBuilderForms(cvData: CVData | undefined) {
     defaultValues: { certifications: cvData?.certifications || [] },
   });
 
+  const salaryForm = useForm({
+    resolver: zodResolver(salarySchema),
+    defaultValues: cvData?.salary || { amount: "", isNegotiable: false },
+  });
+
+
   const experienceArray = useFieldArray({
     control: experienceForm.control,
     name: "experiences",
@@ -197,7 +209,9 @@ export function useBuilderForms(cvData: CVData | undefined) {
       skillsForm.reset({ skills: cvData.skills })
       languagesForm.reset({ languages: cvData.languages })
       certificationsForm.reset({ certifications: cvData.certifications || [] })
+      salaryForm.reset(cvData.salary || { amount: "", isNegotiable: false })
       isInitializedRef.current = true
+
     }
   }, [cvData]);
 
@@ -373,6 +387,19 @@ export function useBuilderForms(cvData: CVData | undefined) {
     return () => subscription.unsubscribe();
   }, [certificationsForm.watch]);
 
+  useEffect(() => {
+    const subscription = salaryForm.watch((data) => {
+      if (isInitializedRef.current) {
+        store.updateSalary({
+          amount: data.amount || "",
+          isNegotiable: !!data.isNegotiable,
+        });
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [salaryForm.watch]);
+
+
   const handlePhotoUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -404,6 +431,8 @@ export function useBuilderForms(cvData: CVData | undefined) {
     skillsArray,
     languagesArray,
     certificationsArray,
+    salaryForm,
     handlePhotoUpload,
   };
+
 }

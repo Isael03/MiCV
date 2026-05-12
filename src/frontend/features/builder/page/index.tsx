@@ -16,7 +16,9 @@ import { ProjectsForm } from '../components/ProjectsForm'
 import { SkillsForm } from '../components/SkillsForm'
 import { LanguagesForm } from '../components/LanguagesForm'
 import { CertificatesForm } from '../components/CertificatesForm'
+import { SalaryForm } from '../components/SalaryForm'
 import { DesignForm } from '../components/DesignForm'
+
 import { DEFAULT_SECTION_ORDER, mapCVProjectToBackendProject } from '../../../shared/types/cv'
 
 function Builder() {
@@ -62,8 +64,10 @@ function Builder() {
     skillsArray,
     languagesArray,
     certificationsArray,
+    salaryForm,
     handlePhotoUpload,
   } = useBuilderForms(cv)
+
 
   useEffect(() => {
     if (currentProject) {
@@ -128,6 +132,10 @@ function Builder() {
           issuer: cert.issuer || '',
           url: cert.url || '',
         })),
+        salary: {
+          amount: salaryForm.getValues().amount || '',
+          isNegotiable: !!salaryForm.getValues().isNegotiable,
+        },
         sectionOrder: currentProject.data.sectionOrder || DEFAULT_SECTION_ORDER,
         hiddenSections: currentProject.data.hiddenSections || [],
         design: currentProject.data.design,
@@ -209,7 +217,9 @@ function Builder() {
             <TabsTrigger value="skills">Habilidades</TabsTrigger>
             <TabsTrigger value="languages">Idiomas</TabsTrigger>
             <TabsTrigger value="certificates">Certificados</TabsTrigger>
+            <TabsTrigger value="salary">Renta</TabsTrigger>
             <TabsTrigger value="design">Diseño</TabsTrigger>
+
           </TabsList>
 
           <TabsContent value="personal" className="mt-6">
@@ -273,7 +283,12 @@ function Builder() {
             />
           </TabsContent>
 
+          <TabsContent value="salary" className="mt-6">
+            <SalaryForm form={salaryForm as any} />
+          </TabsContent>
+
           <TabsContent value="design" className="mt-6">
+
             <DesignForm />
           </TabsContent>
         </Tabs>

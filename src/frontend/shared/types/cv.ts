@@ -78,7 +78,9 @@ export type CVSectionKey =
   | "skills"
   | "projects"
   | "languages"
-  | "certifications";
+  | "certifications"
+  | "salary";
+
 
 export const DEFAULT_SECTION_ORDER: CVSectionKey[] = [
   "summary",
@@ -88,7 +90,9 @@ export const DEFAULT_SECTION_ORDER: CVSectionKey[] = [
   "projects",
   "languages",
   "certifications",
+  "salary",
 ];
+
 
 export interface CVData {
   personalInfo: {
@@ -109,10 +113,12 @@ export interface CVData {
   skills: Skill[];
   languages: Language[];
   certifications?: Certification[];
+  salary?: SalaryExpectation;
   sectionOrder: CVSectionKey[];
   hiddenSections: CVSectionKey[];
   design: DesignSettings;
 }
+
 
 export interface Certification {
   id: string;
@@ -121,6 +127,12 @@ export interface Certification {
   issuer?: string;
   url?: string;
 }
+
+export interface SalaryExpectation {
+  amount: string;
+  isNegotiable: boolean;
+}
+
 
 export interface CVProject {
   id: string;
@@ -203,6 +215,7 @@ export interface BackendProject {
   languages: BackendLanguage[];
   certifications?: BackendCertification[];
   projects?: BackendProjectItem[];
+  salary?: SalaryExpectation;
   sectionOrder?: CVSectionKey[];
   hiddenSections?: CVSectionKey[];
   design?: {
@@ -279,7 +292,9 @@ export const mapBackendProjectToCVProject = (
       issuer: c.issuer,
       url: c.url,
     })) || [],
+    salary: backend.salary || { amount: "", isNegotiable: false },
     sectionOrder: backend.sectionOrder
+
       ? [...backend.sectionOrder]
       : [...DEFAULT_SECTION_ORDER],
     hiddenSections: backend.hiddenSections ? [...backend.hiddenSections] : [],
@@ -354,7 +369,9 @@ export const mapCVProjectToBackendProject = (
       issuer: c.issuer,
       url: c.url,
     })),
+    salary: cvProject.data.salary,
     sectionOrder: cvProject.data.sectionOrder,
+
     hiddenSections: cvProject.data.hiddenSections,
     design: {
       fontFamily: cvProject.data.design.fontFamily,
@@ -413,7 +430,9 @@ export const createEmptyCV = (): CVData => ({
   skills: [],
   languages: [],
   certifications: [],
+  salary: { amount: "", isNegotiable: false },
   sectionOrder: [...DEFAULT_SECTION_ORDER],
+
   hiddenSections: [],
   design: {
     fontFamily: "Inter",

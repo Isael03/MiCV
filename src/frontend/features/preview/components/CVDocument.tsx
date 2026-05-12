@@ -1,4 +1,4 @@
-import { Fragment, forwardRef } from "react";
+import React, { Fragment, forwardRef } from "react";
 const ICON_SVGS = {
   mapPin: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black" stroke="black" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3" fill="white"/></svg>`,
   mail: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black" stroke="black" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" fill="none" stroke="white" stroke-width="2"/></svg>`,
@@ -44,7 +44,7 @@ interface CVDocumentProps {
 }
 
 const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
-  ({ cv, isExporting }, ref) => {
+  ({ cv, isExporting }: CVDocumentProps, ref: React.ForwardedRef<HTMLDivElement>) => {
     const iconPaddingTop = isExporting ? "13px" : "4px";
     const softSkills = cv.skills.filter((s: Skill) => s.type === "Blanda");
     const certifications = (cv.certifications || []).filter(
@@ -54,14 +54,23 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
     const technicalSkills = cv.skills.filter(
       (s: Skill) => s.type === "Técnica",
     );
+    const sortedCertifications = [...certifications].sort((a, b) =>
+      parseDateString(b.date) - parseDateString(a.date),
+    );
 
     // Ordenar experiencia y educación por fecha descendente (más reciente primero)
-    const sortedExperience = [...cv.experience].sort((a, b) =>
-      (b.startDate || "").localeCompare(a.startDate || ""),
-    );
-    const sortedEducation = [...cv.education].sort((a, b) =>
-      (b.startDate || "").localeCompare(a.startDate || ""),
-    );
+    const sortedExperience = [...cv.experience].sort((a, b) => {
+      const dateA = Math.max(parseDateString(a.endDate), parseDateString(a.startDate));
+      const dateB = Math.max(parseDateString(b.endDate), parseDateString(b.startDate));
+      if (dateB !== dateA) return dateB - dateA;
+      return parseDateString(b.startDate) - parseDateString(a.startDate);
+    });
+    const sortedEducation = [...cv.education].sort((a, b) => {
+      const dateA = Math.max(parseDateString(eduEndDate(a)), parseDateString(a.startDate));
+      const dateB = Math.max(parseDateString(eduEndDate(b)), parseDateString(b.startDate));
+      if (dateB !== dateA) return dateB - dateA;
+      return parseDateString(b.startDate) - parseDateString(a.startDate);
+    });
     const sectionOrder = normalizeSectionOrder(
       cv.sectionOrder || DEFAULT_SECTION_ORDER,
     );
@@ -80,10 +89,15 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
             {sortedExperience.map((exp: Experience, i: number) => (
               <div
                 key={exp.id}
+                className="experience-entry"
                 style={{
                   marginBottom: i < sortedExperience.length - 1 ? "14px" : 0,
+                  breakInside: "avoid",
+                  pageBreakInside: "avoid",
                 }}
               >
+
+
                 <div
                   style={{
                     display: "flex",
@@ -145,10 +159,15 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
             {sortedEducation.map((edu: Education, i: number) => (
               <div
                 key={edu.id}
+                className="education-entry"
                 style={{
                   marginBottom: i < sortedEducation.length - 1 ? "10px" : 0,
+                  breakInside: "avoid",
+                  pageBreakInside: "avoid",
                 }}
               >
+
+
                 <p
                   style={{
                     fontWeight: 700,
@@ -190,10 +209,15 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
             {cv.projects.map((proj: Project, i: number) => (
               <div
                 key={proj.id}
+                className="project-entry"
                 style={{
                   marginBottom: i < cv.projects.length - 1 ? "10px" : 0,
+                  breakInside: "avoid",
+                  pageBreakInside: "avoid",
                 }}
               >
+
+
                 <p style={{ fontWeight: 700, margin: 0, fontSize: "10pt" }}>
                   {proj.name}:
                 </p>
@@ -224,9 +248,9 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
           </Section>
         ) : null,
       certifications: () =>
-        certifications.length > 0 ? (
+        sortedCertifications.length > 0 ? (
           <Section title="CERTIFICADOS">
-            {certifications.map((cert: Certification, i: number) => {
+            {sortedCertifications.map((cert: Certification, i: number) => {
               const formattedDate = formatCertDate(cert.date);
               const meta = [cert.issuer, formattedDate, cert.url]
                 .filter(Boolean)
@@ -234,10 +258,16 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
               return (
                 <div
                   key={cert.id}
+                  className="certification-entry"
                   style={{
-                    marginBottom: i < certifications.length - 1 ? "10px" : 0,
+                    marginBottom:
+                      i < sortedCertifications.length - 1 ? "10px" : 0,
+                    breakInside: "avoid",
+                    pageBreakInside: "avoid",
                   }}
                 >
+
+
                   <p style={{ fontWeight: 700, margin: 0, fontSize: "10pt" }}>
                     {cert.name}
                   </p>
@@ -250,6 +280,17 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
               );
             })}
           </Section>
+        ) : null,
+      salary: () =>
+        cv.salary && cv.salary.amount ? (
+          <div className="salary-section" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+            <Section title="PRETENSIÓN DE RENTA">
+              <p style={{ margin: 0 }}>
+                {cv.salary.amount}
+                {cv.salary.isNegotiable ? " (Conversable)" : ""}
+              </p>
+            </Section>
+          </div>
         ) : null,
     };
 
@@ -269,6 +310,11 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
           color: "#000000",
           fontSize: "10pt",
           lineHeight: 1.5,
+          orphans: 3,
+          widows: 3,
+          hyphens: "none",
+          wordBreak: "normal",
+          overflowWrap: "break-word",
           padding: isExporting
             ? "40px 50px"
             : "clamp(16px, 4vw, 40px) clamp(16px, 5vw, 50px)",
@@ -573,19 +619,23 @@ const CVDocument = forwardRef<HTMLDivElement, CVDocumentProps>(
 
 CVDocument.displayName = "CVDocument";
 
+interface ListItemProps {
+  children: React.ReactNode;
+  isExporting?: boolean;
+}
+
 function ListItem({
   children,
   isExporting,
-}: {
-  children: React.ReactNode;
-  isExporting?: boolean;
-}) {
+}: ListItemProps) {
   // Ajustamos el padding para el PDF - reduciendo de 10px a 4.5px
   const bulletPaddingTop = isExporting ? "1px" : "1px";
 
   return (
-    <div style={{ display: "table", width: "100%", marginBottom: "2px" }}>
+    <div className="ListItem" style={{ display: "table", width: "100%", marginBottom: "2px", breakInside: "avoid", pageBreakInside: "avoid" }}>
       <div style={{ display: "table-row" }}>
+
+
         <div
           style={{
             display: "table-cell",
@@ -610,34 +660,38 @@ function ListItem({
 }
 
 /* ── Section helper ── */
+interface SectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+
 function Section({
   title,
   children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+}: SectionProps) {
   return (
     <section style={{ marginBottom: "18px" }}>
-      <h2
-        style={{
-          fontSize: "11pt",
-          fontWeight: 700,
-          color: "#000000",
-          margin: "0 0 6px",
-          paddingBottom: "4px",
-          letterSpacing: "1px",
-        }}
-      >
-        {title}
-      </h2>
-      <hr
+      <div className="section-header" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+        <h2
+          style={{
+            fontSize: "11pt",
+            fontWeight: 700,
+            color: "#000000",
+            margin: "0 0 6px",
+            paddingBottom: "4px",
+            letterSpacing: "1px",
+          }}
+        >
+          {title}
+        </h2>
+        <hr
         style={{
           border: "none",
           borderTop: "2px solid #000000",
           margin: "0 0 10px",
         }}
       />
+      </div>
       {children}
     </section>
   );
@@ -714,3 +768,110 @@ function normalizeHiddenSections(hidden: CVSectionKey[]): CVSectionKey[] {
 }
 
 export default CVDocument;
+
+function parseDateString(dateStr: string | undefined): number {
+  if (!dateStr) return 0;
+  const trimmed = dateStr.trim().toLowerCase();
+
+  // Si es "Actual" o similar, le damos un valor muy alto para que aparezca de primero
+  if (
+    ["actual", "presente", "present", "now", "hoy", "actualidad"].includes(
+      trimmed,
+    )
+  ) {
+    return new Date().getTime() + 86400000000; // Unos 1000 días en el futuro
+  }
+
+  const monthsSpanish = [
+    "enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre",
+  ];
+  const monthsEnglish = [
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+  ];
+  const monthsSpanishShort = [
+    "ene",
+    "feb",
+    "mar",
+    "abr",
+    "may",
+    "jun",
+    "jul",
+    "ago",
+    "sep",
+    "oct",
+    "nov",
+    "dic",
+  ];
+
+  let month = -1;
+  let year = -1;
+
+  // Intentar encontrar un año (4 dígitos)
+  const yearMatch = trimmed.match(/\b(19|20)\d{2}\b/);
+  if (yearMatch) {
+    year = parseInt(yearMatch[0], 10);
+  }
+
+  // Intentar encontrar el nombre del mes
+  monthsSpanish.forEach((m, i) => {
+    if (trimmed.includes(m)) month = i;
+  });
+  if (month === -1) {
+    monthsEnglish.forEach((m, i) => {
+      if (trimmed.includes(m)) month = i;
+    });
+  }
+  if (month === -1) {
+    monthsSpanishShort.forEach((m, i) => {
+      if (trimmed.includes(m)) month = i;
+    });
+  }
+
+  // Si no se encontró nombre de mes, intentar buscar un número de mes (1-12)
+  if (month === -1) {
+    const monthMatch = trimmed.match(/\b(0?[1-9]|1[0-2])\b/);
+    if (monthMatch && year !== -1) {
+      // Nos aseguramos que el mes no sea el mismo que el año
+      if (monthMatch[0] !== yearMatch?.[0]) {
+        month = parseInt(monthMatch[0], 10) - 1;
+      }
+    }
+  }
+
+  if (year !== -1) {
+    return new Date(year, month !== -1 ? month : 0).getTime();
+  }
+
+  const parsed = Date.parse(dateStr);
+  if (!isNaN(parsed)) return parsed;
+
+  return 0;
+}
+
+function eduEndDate(edu: Education): string {
+  // Manejar propiedades legadas si es necesario, pero usualmente usamos endDate
+  return edu.endDate || "";
+}
+

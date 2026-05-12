@@ -171,7 +171,9 @@ const SECTION_LABELS: Record<CVSectionKey, string> = {
   projects: "Proyectos",
   languages: "Idiomas",
   certifications: "Certificados",
+  salary: "Pretensión de Renta",
 };
+
 
 function normalizeSectionOrder(order: CVSectionKey[]): CVSectionKey[] {
   const unique = order.filter(

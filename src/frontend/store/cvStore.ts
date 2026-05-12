@@ -16,7 +16,9 @@ import {
   createEmptySkill,
   createEmptyLanguage,
   createEmptyCertification,
+  SalaryExpectation,
 } from "../shared/types/cv";
+
 
 interface CVStore {
   projects: CVProject[];
@@ -69,7 +71,9 @@ interface CVStore {
   addCertification: () => void;
   updateCertification: (id: string, data: Partial<Certification>) => void;
   removeCertification: (id: string) => void;
+  updateSalary: (data: Partial<SalaryExpectation>) => void;
 }
+
 
 export const useCVStore = create<CVStore>((set, get) => ({
   projects: [],
@@ -595,4 +599,24 @@ export const useCVStore = create<CVStore>((set, get) => ({
       ),
     });
   },
+  updateSalary: (data) => {
+    const { currentProjectId, projects } = get();
+    if (!currentProjectId) return;
+
+    set({
+      projects: projects.map((p) =>
+        p.id === currentProjectId
+          ? {
+              ...p,
+              data: {
+                ...p.data,
+                salary: { ...(p.data.salary || { amount: "", isNegotiable: false }), ...data },
+              },
+              updatedAt: new Date().toISOString(),
+            }
+          : p,
+      ),
+    });
+  },
 }));
+
